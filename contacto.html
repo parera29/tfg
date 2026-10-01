@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contacto · Gabriel Automoción</title>
+<meta name="description" content="Contacta con Gabriel Automoción por teléfono, WhatsApp, email o formulario.">
+<meta name="theme-color" content="#0c0e12">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Contacto · Gabriel Automoción">
+<meta property="og:description" content="Contacta con Gabriel Automoción por teléfono, WhatsApp, email o formulario.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/sora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="contacto">
+<a class="skip" href="#main">Saltar al contenido</a>
+<div id="app-header"></div>
+<main id="main">
+<section class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Ruta"><a href="index.html">Inicio</a><span>/</span><span>Contacto</span></nav>
+    <span class="eyebrow">Contacto</span>
+    <h1>Hablemos</h1>
+    <p>Escríbenos, llámanos o envíanos un WhatsApp. Te atenderemos de forma personalizada.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="reveal">
+        <h2>Datos de contacto</h2>
+        <ul class="contact-list">
+          <li><span class="feature-ico" data-icon="phone"></span><div><small>Teléfono</small><strong data-site="phone"></strong></div></li>
+          <li><span class="feature-ico" data-icon="whatsapp"></span><div><small>WhatsApp</small><strong data-site="whatsapp"></strong></div></li>
+          <li><span class="feature-ico" data-icon="mail"></span><div><small>Email</small><strong data-site="email"></strong></div></li>
+          <li><span class="feature-ico" data-icon="pin"></span><div><small>Dirección</small><strong data-site="address"></strong></div></li>
+          <li><span class="feature-ico" data-icon="clock"></span><div><small>Horario</small><strong data-site="schedule"></strong></div></li>
+        </ul>
+        <div class="contact-btns">
+          <button class="btn btn--wa btn--lg" data-action="whatsapp" data-icon="whatsapp">WhatsApp</button>
+          <button class="btn btn--dark btn--lg" data-action="call" data-icon="phone">Llamar</button>
+        </div>
+      </div>
+      <div class="form-card reveal reveal-d1">
+        <h3>Envíanos un mensaje</h3>
+        <p class="muted">Responderemos lo antes posible.</p>
+        <form data-lead="contacto" class="form-grid" id="contactForm">
+          <div class="field"><label for="cf-nombre">Nombre *</label><input class="input" id="cf-nombre" name="nombre" autocomplete="name" required></div>
+          <div class="field"><label for="cf-tel">Teléfono *</label><input class="input" id="cf-tel" name="telefono" type="tel" inputmode="tel" autocomplete="tel" required></div>
+          <div class="field full"><label for="cf-email">Email *</label><input class="input" id="cf-email" name="email" type="email" autocomplete="email" required></div>
+          <div class="field full"><label for="cf-asunto">Asunto</label><select class="select" id="cf-asunto" name="asunto">
+            <option value="Información general">Información general</option>
+            <option value="Vehículo concreto">Consulta sobre un vehículo</option>
+            <option value="Financiación">Financiación</option>
+            <option value="Prueba de vehículo">Prueba de vehículo</option>
+            <option value="Tasación">Tasación de mi vehículo</option>
+            <option value="Venta de mi vehículo">Venta de mi vehículo</option>
+            <option value="Garantía">Garantía</option>
+            <option value="Otro">Otro</option>
+          </select></div>
+          <div class="field full"><label for="cf-msg">Mensaje *</label><textarea class="textarea" id="cf-msg" name="mensaje" required placeholder="¿En qué podemos ayudarte?"></textarea></div>
+          <div class="full"><div data-privacy></div></div>
+          <div class="full"><button class="btn btn--dark btn--lg btn--block" type="submit">Enviar mensaje</button></div>
+        </form>
+      </div>
+    </div>
+    <div class="map-box reveal" id="mapBox"></div>
+  </div>
+</section>
+</main>
+<div id="app-footer"></div>
+<script src="js/config.js"></script>
+<script src="js/demo-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/pages/contact.js"></script>
+</body>
+</html>

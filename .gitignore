@@ -1,0 +1,8 @@
+node_modules/
+# Datos generados por el servidor (stock editado, solicitudes y fotos subidas)
+data/*.json
+data/*.tmp
+uploads/*
+!uploads/.gitkeep
+!data/.gitkeep
+.DS_Store

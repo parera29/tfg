@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gestión de stock · Gabriel Automoción</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0c0e12">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body data-page="admin" class="admin-body">
+
+<!-- Acceso -->
+<section class="login" id="login" hidden>
+  <form class="login-card" id="loginForm">
+    <a class="logo" href="index.html"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M29 13.5A11 11 0 1 0 31 22H20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg></span><span class="logo-text"><strong>GABRIEL</strong><small>AUTOMOCIÓN</small></span></a>
+    <h1>Panel de gestión</h1>
+    <p class="muted">Accede para gestionar el stock de vehículos y las solicitudes recibidas.</p>
+    <div class="field"><label for="pw">Contraseña</label><input class="input" type="password" id="pw" autocomplete="current-password" required autofocus></div>
+    <button class="btn btn--dark btn--lg btn--block" type="submit">Entrar</button>
+    <p class="login-hint" id="loginHint"></p>
+    <a class="link-arrow small" href="index.html">← Volver a la web</a>
+  </form>
+</section>
+
+<!-- Aplicación -->
+<div class="admin" id="app" hidden>
+  <aside class="admin-side">
+    <a class="logo logo--light" href="index.html"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M29 13.5A11 11 0 1 0 31 22H20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg></span><span class="logo-text"><strong>GABRIEL</strong><small>GESTIÓN</small></span></a>
+    <nav class="admin-nav">
+      <button class="is-active" data-view="stock" data-icon="car">Stock</button>
+      <button data-view="leads" data-icon="inbox">Solicitudes <span class="badge" id="leadBadge" hidden></span></button>
+      <button data-view="settings" data-icon="gear">Datos y ajustes</button>
+    </nav>
+    <div class="admin-side-foot">
+      <a href="index.html" target="_blank" data-icon="eye">Ver la web</a>
+      <button id="logout" data-icon="logout">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="mode-banner" id="modeBanner"></div>
+
+    <!-- STOCK -->
+    <section data-panel="stock">
+      <header class="admin-head">
+        <div><h1>Stock de vehículos</h1><p class="muted">Añade, edita y gestiona los vehículos que se muestran en la web.</p></div>
+        <button class="btn btn--primary" id="addVehicle" data-icon="plus">Añadir vehículo</button>
+      </header>
+      <div class="stats" id="stats"></div>
+      <div class="admin-toolbar">
+        <div class="search"><span data-icon="search"></span><input class="input" id="q" type="search" placeholder="Buscar por marca, modelo, referencia…"></div>
+        <select class="select" id="fEstado" aria-label="Filtrar por estado">
+          <option value="">Todos los estados</option><option value="disponible">Disponibles</option><option value="reservado">Reservados</option>
+          <option value="vendido">Vendidos</option><option value="oculto">Ocultos</option><option value="destacado">Destacados</option>
+        </select>
+      </div>
+      <div class="vlist" id="vlist"></div>
+    </section>
+
+    <!-- SOLICITUDES -->
+    <section data-panel="leads" hidden>
+      <header class="admin-head">
+        <div><h1>Solicitudes recibidas</h1><p class="muted">Mensajes enviados desde los formularios de la web.</p></div>
+        <select class="select" id="fLead" aria-label="Filtrar solicitudes" style="max-width:220px">
+          <option value="">Todas</option><option value="nuevo">Nuevas</option><option value="contactado">Contactadas</option><option value="cerrado">Cerradas</option>
+        </select>
+      </header>
+      <div class="leads" id="leadList"></div>
+    </section>
+
+    <!-- AJUSTES -->
+    <section data-panel="settings" hidden>
+      <header class="admin-head"><div><h1>Datos y ajustes</h1><p class="muted">Copias de seguridad y datos de contacto de la web.</p></div></header>
+      <div class="settings-grid">
+        <div class="panel">
+          <h3>Datos de contacto de la web</h3>
+          <p class="muted small">Se editan en el archivo <code>js/config.js</code>. Los que aparecen como pendientes se muestran en la web como “[DATO A CONFIRMAR]”.</p>
+          <dl class="kv" id="cfgList"></dl>
+        </div>
+        <div class="panel">
+          <h3>Copia de seguridad</h3>
+          <p class="muted small">Descarga todo el stock y las solicitudes en un archivo, o restaura el stock desde una copia.</p>
+          <div class="btn-row">
+            <button class="btn btn--dark btn--sm" id="exportBtn" data-icon="download">Descargar copia</button>
+            <label class="btn btn--outline btn--sm" data-icon="upload">Restaurar stock<input type="file" id="importFile" accept="application/json,.json" hidden></label>
+          </div>
+          <hr>
+          <h3>Datos de demostración</h3>
+          <p class="muted small">Restablece el stock con los vehículos de ejemplo (DEMO). Se perderán los cambios realizados en el stock.</p>
+          <button class="btn btn--danger btn--sm" id="resetBtn" data-icon="refresh">Restablecer stock de demostración</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Editor de vehículo -->
+<div class="editor" id="editor" hidden>
+  <div class="editor-backdrop" data-editor-close></div>
+  <form class="editor-panel" id="vForm" novalidate>
+    <header class="editor-head">
+      <div><h2 id="edTitle">Nuevo vehículo</h2><p class="muted small" id="edId"></p></div>
+      <button type="button" class="icon-btn" data-editor-close aria-label="Cerrar" data-icon="close"></button>
+    </header>
+    <div class="editor-body">
+      <fieldset>
+        <legend>Fotografías</legend>
+        <div class="dropzone" id="dropzone">
+          <span data-icon="upload"></span>
+          <strong>Arrastra aquí las fotos o pulsa para seleccionarlas</strong>
+          <small>JPG, PNG o WEBP. Se optimizan automáticamente. La primera foto es la principal.</small>
+          <input type="file" id="photoInput" accept="image/*" multiple>
+        </div>
+        <div class="photos" id="photos"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Datos principales</legend>
+        <div class="grid-3">
+          <div class="field"><label for="e-marca">Marca *</label><input class="input" id="e-marca" name="marca" list="dl-marca" required></div>
+          <div class="field"><label for="e-modelo">Modelo *</label><input class="input" id="e-modelo" name="modelo" list="dl-modelo" required></div>
+          <div class="field"><label for="e-version">Versión</label><input class="input" id="e-version" name="version" placeholder="Ej. 320d Sport Line"></div>
+          <div class="field"><label for="e-precio">Precio (€) *</label><input class="input" id="e-precio" name="precio" type="number" inputmode="numeric" min="0" step="1" required></div>
+          <div class="field"><label for="e-precioAnterior">Precio anterior (€)</label><input class="input" id="e-precioAnterior" name="precioAnterior" type="number" inputmode="numeric" min="0" step="1" placeholder="Opcional (aparece tachado)"></div>
+          <div class="field"><label for="e-tipo">Tipo</label><select class="select" id="e-tipo" name="tipo"><option>Ocasión</option><option>Seminuevo</option><option>Km 0</option><option>Nuevo</option></select></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Características</legend>
+        <div class="grid-3">
+          <div class="field"><label for="e-anio">Año</label><input class="input" id="e-anio" name="anio" type="number" inputmode="numeric" min="1950" max="2100"></div>
+          <div class="field"><label for="e-km">Kilómetros</label><input class="input" id="e-km" name="km" type="number" inputmode="numeric" min="0" step="1"></div>
+          <div class="field"><label for="e-potencia">Potencia (CV)</label><input class="input" id="e-potencia" name="potencia" type="number" inputmode="numeric" min="0"></div>
+          <div class="field"><label for="e-combustible">Combustible</label><select class="select" id="e-combustible" name="combustible"><option>Gasolina</option><option>Diésel</option><option>Híbrido</option><option>Híbrido enchufable</option><option>Eléctrico</option><option>GLP</option><option>GNC</option></select></div>
+          <div class="field"><label for="e-cambio">Cambio</label><select class="select" id="e-cambio" name="cambio"><option>Manual</option><option>Automático</option></select></div>
+          <div class="field"><label for="e-carroceria">Carrocería</label><select class="select" id="e-carroceria" name="carroceria"><option>Berlina</option><option>Compacto</option><option>SUV</option><option>Familiar</option><option>Utilitario</option><option>Monovolumen</option><option>Coupé</option><option>Cabrio</option><option>Pick-up</option><option>Furgoneta</option></select></div>
+          <div class="field"><label for="e-color">Color</label><input class="input" id="e-color" name="color" list="dl-color"></div>
+          <div class="field"><label for="e-etiqueta">Etiqueta ambiental</label><select class="select" id="e-etiqueta" name="etiqueta"><option value="0">0 Emisiones</option><option value="ECO">ECO</option><option value="C">C</option><option value="B">B</option><option value="Sin etiqueta">Sin etiqueta</option></select></div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Estado y visibilidad</legend>
+        <div class="grid-3">
+          <div class="field"><label for="e-estado">Estado</label><select class="select" id="e-estado" name="estado"><option value="disponible">Disponible</option><option value="reservado">Reservado</option><option value="vendido">Vendido</option></select></div>
+          <label class="toggle"><input type="checkbox" name="destacado"><span></span><div><strong>Destacado</strong><small>Aparece en la página de inicio</small></div></label>
+          <label class="toggle"><input type="checkbox" name="oculto"><span></span><div><strong>Oculto</strong><small>No se muestra en la web</small></div></label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Descripción</legend>
+        <textarea class="textarea" name="descripcion" rows="6" placeholder="Describe el estado del vehículo, mantenimiento, propietarios, extras…"></textarea>
+      </fieldset>
+
+      <fieldset>
+        <legend>Equipamiento</legend>
+        <div class="tag-input">
+          <input class="input" id="equipInput" placeholder="Escribe un elemento y pulsa Intro (ej. Navegador)">
+          <button type="button" class="btn btn--dark btn--sm" id="equipAdd">Añadir</button>
+        </div>
+        <div class="tags" id="equipTags"></div>
+        <details class="small" style="margin-top:10px"><summary class="muted">Pegar una lista completa</summary>
+          <textarea class="textarea" id="equipBulk" rows="4" placeholder="Un elemento por línea o separados por comas"></textarea>
+          <button type="button" class="btn btn--outline btn--sm" id="equipBulkAdd" style="margin-top:8px">Añadir lista</button>
+        </details>
+      </fieldset>
+    </div>
+    <footer class="editor-foot">
+      <button type="button" class="btn btn--ghost" data-editor-close>Cancelar</button>
+      <button type="submit" class="btn btn--dark" id="saveBtn">Guardar vehículo</button>
+    </footer>
+  </form>
+</div>
+
+<datalist id="dl-marca"></datalist>
+<datalist id="dl-modelo"></datalist>
+<datalist id="dl-color"><option>Blanco</option><option>Negro</option><option>Gris</option><option>Plata</option><option>Azul</option><option>Rojo</option><option>Verde</option><option>Marrón</option><option>Beige</option><option>Naranja</option><option>Amarillo</option></datalist>
+
+<script src="js/config.js"></script>
+<script src="js/demo-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/pages/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "gabriel-automocion-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web demo de Gabriel Automoción: catálogo de vehículos, financiación, contacto y panel de gestión de stock.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

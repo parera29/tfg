@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vehículos de ocasión · Gabriel Automoción</title>
+<meta name="description" content="Vehículos de ocasión en Gabriel Automoción: stock seleccionado, información detallada y financiación.">
+<meta name="theme-color" content="#0c0e12">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vehículos de ocasión · Gabriel Automoción">
+<meta property="og:description" content="Vehículos de ocasión en Gabriel Automoción: stock seleccionado, información detallada y financiación.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/sora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="ocasion">
+<a class="skip" href="#main">Saltar al contenido</a>
+<div id="app-header"></div>
+<main id="main">
+<section class="page-hero page-hero--img">
+  <div class="page-hero-bg"><img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&q=60&w=1600" alt="" onerror="this.remove()"></div>
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Ruta"><a href="index.html">Inicio</a><span>/</span><a href="vehiculos.html">Vehículos</a><span>/</span><span>Ocasión</span></nav>
+    <span class="eyebrow">Vehículos de ocasión</span>
+    <h1>Vehículos de ocasión</h1>
+    <p>Vehículos de segunda mano seleccionados, con toda la información a la vista y atención personalizada para resolver cualquier duda.</p>
+  </div>
+</section>
+<div class="container">
+  <div class="intro-strip">
+    <div><span data-icon="eye"></span><div><h3>Información transparente</h3><p>Fotografías, kilómetros, año y equipamiento de cada vehículo.</p></div></div>
+    <div><span data-icon="shield"></span><div><h3>Garantía</h3><p>Condiciones de garantía: <span class="tbc">[DATO A CONFIRMAR]</span></p></div></div>
+    <div><span data-icon="steering"></span><div><h3>Prueba del vehículo</h3><p>Solicita una prueba antes de decidirte.</p></div></div>
+  </div>
+</div>
+<div class="filters-backdrop" data-filters-close></div>
+<div class="container catalog">
+  <aside class="filters" id="filters" aria-label="Filtros">
+    <div class="filters-head"><h2 data-icon="filter">Filtros</h2><div style="display:flex;gap:6px;align-items:center"><button type="button" class="filters-reset" id="filtersReset">Limpiar</button><button type="button" class="icon-btn filters-close" data-filters-close aria-label="Cerrar filtros" data-icon="close"></button></div></div>
+    <form id="filterForm">
+      <div class="field"><label for="f-marca">Marca</label><select class="select" id="f-marca" name="marca"><option value="">Todas</option></select></div>
+      <div class="field"><label for="f-modelo">Modelo</label><select class="select" id="f-modelo" name="modelo"><option value="">Todos</option></select></div>
+      <div class="field"><span class="label">Precio</span><div class="row2">
+        <select class="select" name="precioMin" aria-label="Precio mínimo"><option value="">Mín.</option><option value="5000">5.000 €</option><option value="10000">10.000 €</option><option value="15000">15.000 €</option><option value="20000">20.000 €</option><option value="25000">25.000 €</option><option value="30000">30.000 €</option><option value="40000">40.000 €</option></select>
+        <select class="select" name="precioMax" aria-label="Precio máximo"><option value="">Máx.</option><option value="10000">10.000 €</option><option value="15000">15.000 €</option><option value="20000">20.000 €</option><option value="25000">25.000 €</option><option value="30000">30.000 €</option><option value="40000">40.000 €</option><option value="50000">50.000 €</option><option value="75000">75.000 €</option></select>
+      </div></div>
+      <div class="field"><label for="f-km">Kilómetros</label><select class="select" id="f-km" name="kmMax"><option value="">Cualquiera</option><option value="10000">Hasta 10.000 km</option><option value="25000">Hasta 25.000 km</option><option value="50000">Hasta 50.000 km</option><option value="75000">Hasta 75.000 km</option><option value="100000">Hasta 100.000 km</option><option value="150000">Hasta 150.000 km</option></select></div>
+      <div class="field"><label for="f-anio">Año</label><select class="select" id="f-anio" name="anioMin"><option value="">Cualquiera</option></select></div>
+      <div class="field"><label for="f-comb">Combustible</label><select class="select" id="f-comb" name="combustible"><option value="">Todos</option></select></div>
+      <div class="field"><span class="label">Cambio</span><div class="seg">
+        <label><input type="radio" name="cambio" value="" checked><span>Todos</span></label>
+        <label><input type="radio" name="cambio" value="Manual"><span>Manual</span></label>
+        <label><input type="radio" name="cambio" value="Automático"><span>Automático</span></label>
+      </div></div>
+      <div class="field"><label for="f-carroceria">Carrocería</label><select class="select" id="f-carroceria" name="carroceria"><option value="">Todas</option></select></div>
+      <label class="check"><input type="checkbox" name="vendidos" value="1"><span>Mostrar también vehículos vendidos</span></label>
+      <div class="filters-apply"><button type="button" class="btn btn--dark btn--block" data-filters-close id="filtersApply">Ver resultados</button></div>
+    </form>
+  </aside>
+  <section aria-live="polite">
+    <div class="toolbar">
+      <p class="result-count" id="resultCount">Cargando vehículos…</p>
+      <div class="toolbar-right">
+        <button class="btn btn--outline btn--sm filters-open" id="filtersOpen" data-icon="filter">Filtros</button>
+        <label class="sr-only" for="sort">Ordenar</label>
+        <select class="select" id="sort" name="orden">
+          <option value="recientes">Más recientes</option>
+          <option value="precio-asc">Precio: menor a mayor</option>
+          <option value="precio-desc">Precio: mayor a menor</option>
+          <option value="km-asc">Menos kilómetros</option>
+        </select>
+      </div>
+    </div>
+    <div class="active-chips" id="activeChips"></div>
+    <div class="vgrid" id="results"></div>
+  </section>
+</div>
+</main>
+<div id="app-footer"></div>
+<script src="js/config.js"></script>
+<script src="js/demo-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/pages/catalog.js"></script>
+</body>
+</html>

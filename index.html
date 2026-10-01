@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gabriel Automoción · Compraventa de vehículos</title>
+<meta name="description" content="Encuentra tu próximo vehículo en Gabriel Automoción: vehículos seleccionados, atención personalizada y soluciones de financiación.">
+<meta name="theme-color" content="#0c0e12">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Gabriel Automoción · Compraventa de vehículos">
+<meta property="og:description" content="Encuentra tu próximo vehículo en Gabriel Automoción: vehículos seleccionados, atención personalizada y soluciones de financiación.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/sora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="home">
+<a class="skip" href="#main">Saltar al contenido</a>
+<div id="app-header"></div>
+<main id="main">
+<section class="hero">
+  <div class="hero-media">
+    <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=70&w=1600" srcset="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=70&w=800 800w, https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=70&w=1400 1400w, https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=70&w=2200 2200w" sizes="100vw" alt="" fetchpriority="high" onerror="this.remove()">
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <span class="eyebrow">Gabriel Automoción</span>
+      <h1>Encuentra tu <em>próximo</em> vehículo</h1>
+      <p class="hero-sub">Vehículos seleccionados, atención personalizada y soluciones de financiación.</p>
+      <div class="hero-actions">
+        <a class="btn btn--primary btn--lg" href="vehiculos.html">Ver vehículos <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
+        <button class="btn btn--wa btn--lg" data-action="whatsapp" data-icon="whatsapp">Hablar por WhatsApp</button>
+      </div>
+      <div class="hero-trust">
+        <span data-icon="check">Vehículos seleccionados</span>
+        <span data-icon="check">Atención personalizada</span>
+        <span data-icon="check">Soluciones de financiación</span>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="quick-search-wrap">
+  <div class="container">
+    <div class="quick-search reveal">
+      <div class="quick-search-title" data-icon="search">Buscador rápido</div>
+      <form id="quickSearch" action="vehiculos.html">
+        <div class="field"><label for="qs-marca">Marca</label><select class="select" id="qs-marca" name="marca"><option value="">Todas</option></select></div>
+        <div class="field"><label for="qs-modelo">Modelo</label><select class="select" id="qs-modelo" name="modelo" disabled><option value="">Todos</option></select></div>
+        <div class="field"><label for="qs-precio">Precio máximo</label><select class="select" id="qs-precio" name="precioMax"><option value="">Sin límite</option><option value="10000">10.000 €</option><option value="15000">15.000 €</option><option value="20000">20.000 €</option><option value="25000">25.000 €</option><option value="30000">30.000 €</option><option value="40000">40.000 €</option><option value="50000">50.000 €</option></select></div>
+        <div class="field"><label for="qs-comb">Combustible</label><select class="select" id="qs-comb" name="combustible"><option value="">Todos</option></select></div>
+        <div class="field"><label for="qs-cambio">Cambio</label><select class="select" id="qs-cambio" name="cambio"><option value="">Todos</option><option>Manual</option><option>Automático</option></select></div>
+        <button class="btn btn--dark" type="submit" id="qs-submit" data-icon="search">Buscar vehículos</button>
+      </form>
+    </div>
+  </div>
+</div>
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <div><span class="eyebrow">Stock</span><h2>Vehículos destacados</h2><p>Una selección de nuestro stock disponible. Consulta todos los detalles, fotografías y opciones de financiación de cada vehículo.</p></div>
+      <a class="btn btn--outline" href="vehiculos.html">Ver todo el stock</a>
+    </div>
+    <div class="vgrid" id="featured"></div>
+    <div class="center" style="margin-top:40px"><a class="btn btn--dark btn--lg" href="vehiculos.html">Ver todo el stock <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a></div>
+  </div>
+</section>
+<section class="section section--soft">
+  <div class="container">
+    <div class="section-head reveal"><div><span class="eyebrow">Por qué Gabriel Automoción</span><h2>Comprar tu vehículo, sin complicaciones</h2></div></div>
+    <div class="features">
+      <div class="feature reveal"><div class="feature-ico" data-icon="car"></div><h3>Vehículos seleccionados</h3><p>Un stock escogido con criterio para que encuentres el vehículo que encaja contigo.</p></div>
+      <div class="feature reveal reveal-d1"><div class="feature-ico" data-icon="users"></div><h3>Atención personalizada</h3><p>Te asesoramos de principio a fin, por teléfono, WhatsApp o en nuestras instalaciones.</p></div>
+      <div class="feature reveal reveal-d2"><div class="feature-ico" data-icon="euro"></div><h3>Financiación</h3><p>Soluciones de financiación sujetas a estudio y aprobación por la entidad financiera.</p></div>
+      <div class="feature reveal reveal-d3"><div class="feature-ico" data-icon="shield"></div><h3>Garantía</h3><p>Condiciones de garantía: <span class="tbc">[DATO A CONFIRMAR]</span></p></div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal"><div><span class="eyebrow">Explora</span><h2>Busca por tipo de vehículo</h2><p>Accede directamente a la categoría que te interesa.</p></div></div>
+    <div class="brands reveal" id="bodyTypes"></div>
+    <div class="section-head reveal" style="margin:56px 0 24px"><div><h3 style="margin:0;font-size:1.4rem">Marcas en stock</h3></div></div>
+    <div class="brands reveal" id="brands"></div>
+  </div>
+</section>
+<section class="section section--soft">
+  <div class="container split">
+    <div class="split-media reveal">
+      <img src="https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?auto=format&fit=crop&q=70&w=1200" alt="" loading="lazy" onerror="UI.imgFallback(this)">
+      <div class="float-card"><small>Ejemplo: 20.000 € a 60 meses*</small><strong id="teaserQuota">—</strong><small>*Simulación orientativa con TIN de ejemplo. No constituye oferta.</small></div>
+    </div>
+    <div class="reveal reveal-d1">
+      <span class="eyebrow">Financiación</span>
+      <h2>Financia tu próximo vehículo</h2>
+      <p>Te ayudamos a encontrar la fórmula de pago que mejor se adapta a ti. Simula tu cuota en segundos y solicita información sin compromiso.</p>
+      <ul class="checklist">
+        <li data-icon="check">Calculadora orientativa de cuota mensual</li>
+        <li data-icon="check">Plazos flexibles para adaptarse a tu presupuesto</li>
+        <li data-icon="check">Operaciones sujetas a estudio y aprobación de la entidad financiera</li>
+      </ul>
+      <a class="btn btn--dark btn--lg" href="financiacion.html">Calcular mi cuota</a>
+    </div>
+  </div>
+</section>
+<section class="section section--dark on-dark">
+  <div class="container">
+    <div class="section-head reveal"><div><span class="eyebrow">Proceso</span><h2>Así de fácil es estrenar vehículo</h2></div></div>
+    <div class="steps">
+      <div class="step reveal"><h3>Elige tu vehículo</h3><p>Explora el stock con filtros por marca, precio, combustible o kilómetros.</p></div>
+      <div class="step reveal reveal-d1"><h3>Contacta con nosotros</h3><p>Por WhatsApp, teléfono o formulario. Resolvemos todas tus dudas.</p></div>
+      <div class="step reveal reveal-d2"><h3>Pruébalo</h3><p>Solicita una prueba del vehículo y compruébalo en persona.</p></div>
+      <div class="step reveal reveal-d3"><h3>Llévatelo</h3><p>Te acompañamos en la financiación y la documentación.</p></div>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container split split--rev">
+    <div class="reveal">
+      <span class="eyebrow">Tasación</span>
+      <h2>¿Quieres vender o entregar tu vehículo?</h2>
+      <p>Cuéntanos qué vehículo tienes y te informamos sobre las opciones de tasación. Condiciones: <span class="tbc">[DATO A CONFIRMAR]</span></p>
+      <div class="hero-actions" style="margin-top:28px">
+        <a class="btn btn--dark btn--lg" href="contacto.html?asunto=tasacion">Solicitar tasación</a>
+        <button class="btn btn--wa btn--lg" data-action="whatsapp" data-msg="Hola, me gustaría solicitar una tasación de mi vehículo a través de la web de Gabriel Automoción." data-icon="whatsapp">Tasación por WhatsApp</button>
+      </div>
+    </div>
+    <div class="split-media reveal reveal-d1"><img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=70&w=1200" alt="" loading="lazy" onerror="UI.imgFallback(this)"></div>
+  </div>
+</section>
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div class="cta-band reveal">
+      <div><h2>Te ayudamos a encontrar tu vehículo</h2><p>¿No encuentras lo que buscas? Cuéntanos qué necesitas y te avisamos cuando tengamos el vehículo ideal para ti.</p></div>
+      <div class="cta-band-actions"><button class="btn btn--wa btn--lg" data-action="whatsapp" data-icon="whatsapp">WhatsApp</button><a class="btn btn--primary btn--lg" href="contacto.html">Contactar</a></div>
+    </div>
+  </div>
+</section>
+</main>
+<div id="app-footer"></div>
+<script src="js/config.js"></script>
+<script src="js/demo-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/pages/home.js"></script>
+</body>
+</html>

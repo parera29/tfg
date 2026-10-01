@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vehículos en stock · Gabriel Automoción</title>
+<meta name="description" content="Consulta todos los vehículos disponibles en Gabriel Automoción. Filtra por marca, modelo, precio, kilómetros, año, combustible, cambio y carrocería.">
+<meta name="theme-color" content="#0c0e12">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vehículos en stock · Gabriel Automoción">
+<meta property="og:description" content="Consulta todos los vehículos disponibles en Gabriel Automoción. Filtra por marca, modelo, precio, kilómetros, año, combustible, cambio y carrocería.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/sora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="vehiculos">
+<a class="skip" href="#main">Saltar al contenido</a>
+<div id="app-header"></div>
+<main id="main">
+<section class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Ruta"><a href="index.html">Inicio</a><span>/</span><span>Vehículos</span></nav>
+    <h1>Vehículos en stock</h1>
+    <p>Filtra por marca, precio, kilómetros o combustible y encuentra el vehículo que estás buscando.</p>
+  </div>
+</section>
+<div class="filters-backdrop" data-filters-close></div>
+<div class="container catalog">
+  <aside class="filters" id="filters" aria-label="Filtros">
+    <div class="filters-head"><h2 data-icon="filter">Filtros</h2><div style="display:flex;gap:6px;align-items:center"><button type="button" class="filters-reset" id="filtersReset">Limpiar</button><button type="button" class="icon-btn filters-close" data-filters-close aria-label="Cerrar filtros" data-icon="close"></button></div></div>
+    <form id="filterForm">
+      <div class="field"><label for="f-marca">Marca</label><select class="select" id="f-marca" name="marca"><option value="">Todas</option></select></div>
+      <div class="field"><label for="f-modelo">Modelo</label><select class="select" id="f-modelo" name="modelo"><option value="">Todos</option></select></div>
+      <div class="field"><span class="label">Precio</span><div class="row2">
+        <select class="select" name="precioMin" aria-label="Precio mínimo"><option value="">Mín.</option><option value="5000">5.000 €</option><option value="10000">10.000 €</option><option value="15000">15.000 €</option><option value="20000">20.000 €</option><option value="25000">25.000 €</option><option value="30000">30.000 €</option><option value="40000">40.000 €</option></select>
+        <select class="select" name="precioMax" aria-label="Precio máximo"><option value="">Máx.</option><option value="10000">10.000 €</option><option value="15000">15.000 €</option><option value="20000">20.000 €</option><option value="25000">25.000 €</option><option value="30000">30.000 €</option><option value="40000">40.000 €</option><option value="50000">50.000 €</option><option value="75000">75.000 €</option></select>
+      </div></div>
+      <div class="field"><label for="f-km">Kilómetros</label><select class="select" id="f-km" name="kmMax"><option value="">Cualquiera</option><option value="10000">Hasta 10.000 km</option><option value="25000">Hasta 25.000 km</option><option value="50000">Hasta 50.000 km</option><option value="75000">Hasta 75.000 km</option><option value="100000">Hasta 100.000 km</option><option value="150000">Hasta 150.000 km</option></select></div>
+      <div class="field"><label for="f-anio">Año</label><select class="select" id="f-anio" name="anioMin"><option value="">Cualquiera</option></select></div>
+      <div class="field"><label for="f-comb">Combustible</label><select class="select" id="f-comb" name="combustible"><option value="">Todos</option></select></div>
+      <div class="field"><span class="label">Cambio</span><div class="seg">
+        <label><input type="radio" name="cambio" value="" checked><span>Todos</span></label>
+        <label><input type="radio" name="cambio" value="Manual"><span>Manual</span></label>
+        <label><input type="radio" name="cambio" value="Automático"><span>Automático</span></label>
+      </div></div>
+      <div class="field"><label for="f-carroceria">Carrocería</label><select class="select" id="f-carroceria" name="carroceria"><option value="">Todas</option></select></div>
+      <div class="field"><label for="f-tipo">Tipo</label><select class="select" id="f-tipo" name="tipo"><option value="">Todos</option><option>Ocasión</option><option>Seminuevo</option><option>Km 0</option></select></div>
+      <label class="check"><input type="checkbox" name="vendidos" value="1"><span>Mostrar también vehículos vendidos</span></label>
+      <div class="filters-apply"><button type="button" class="btn btn--dark btn--block" data-filters-close id="filtersApply">Ver resultados</button></div>
+    </form>
+  </aside>
+  <section aria-live="polite">
+    <div class="toolbar">
+      <p class="result-count" id="resultCount">Cargando vehículos…</p>
+      <div class="toolbar-right">
+        <button class="btn btn--outline btn--sm filters-open" id="filtersOpen" data-icon="filter">Filtros</button>
+        <label class="sr-only" for="sort">Ordenar</label>
+        <select class="select" id="sort" name="orden">
+          <option value="recientes">Más recientes</option>
+          <option value="precio-asc">Precio: menor a mayor</option>
+          <option value="precio-desc">Precio: mayor a menor</option>
+          <option value="km-asc">Menos kilómetros</option>
+        </select>
+      </div>
+    </div>
+    <div class="active-chips" id="activeChips"></div>
+    <div class="vgrid" id="results"></div>
+  </section>
+</div>
+</main>
+<div id="app-footer"></div>
+<script src="js/config.js"></script>
+<script src="js/demo-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/pages/catalog.js"></script>
+</body>
+</html>

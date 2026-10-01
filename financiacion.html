@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Financiación · Gabriel Automoción</title>
+<meta name="description" content="Financia tu próximo vehículo en Gabriel Automoción. Calculadora orientativa de cuota mensual y solicitud de información.">
+<meta name="theme-color" content="#0c0e12">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Financiación · Gabriel Automoción">
+<meta property="og:description" content="Financia tu próximo vehículo en Gabriel Automoción. Calculadora orientativa de cuota mensual y solicitud de información.">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/sora-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="financiacion">
+<a class="skip" href="#main">Saltar al contenido</a>
+<div id="app-header"></div>
+<main id="main">
+<section class="page-hero page-hero--img">
+  <div class="page-hero-bg"><img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&q=60&w=1600" alt="" onerror="this.remove()"></div>
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Ruta"><a href="index.html">Inicio</a><span>/</span><span>Financiación</span></nav>
+    <span class="eyebrow">Financiación</span>
+    <h1>Financia tu próximo vehículo</h1>
+    <p>Existen opciones de financiación para la compra de tu vehículo, sujetas a la aprobación y a las condiciones de la entidad financiera. Calcula una cuota orientativa y solicita información sin compromiso.</p>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="calc-wrap reveal">
+      <form class="calc-form" id="calc" onsubmit="return false">
+        <h2>Calculadora orientativa</h2>
+        <p class="muted">Ajusta los valores para estimar tu cuota mensual.</p>
+        <div class="field">
+          <div class="range-row"><label for="c-price">Precio del vehículo</label><output id="o-price"></output></div>
+          <input type="range" id="r-price" min="3000" max="100000" step="500" value="20000" aria-label="Precio del vehículo (deslizador)">
+          <div class="input-suffix"><input class="input" id="c-price" type="number" inputmode="numeric" min="0" step="100" value="20000"><span>€</span></div>
+        </div>
+        <div class="field">
+          <div class="range-row"><label for="c-down">Entrada</label><output id="o-down"></output></div>
+          <input type="range" id="r-down" min="0" max="20000" step="250" value="3000" aria-label="Entrada (deslizador)">
+          <div class="input-suffix"><input class="input" id="c-down" type="number" inputmode="numeric" min="0" step="100" value="3000"><span>€</span></div>
+        </div>
+        <div class="field">
+          <span class="label">Plazo</span>
+          <div class="seg seg-terms" id="terms"></div>
+        </div>
+        <div class="field">
+          <label for="c-rate">Interés orientativo (TIN anual)</label>
+          <div class="input-suffix"><input class="input" id="c-rate" type="number" inputmode="decimal" min="0" max="30" step="0.1"><span>%</span></div>
+          <small class="muted">Valor de ejemplo editable. No corresponde a ninguna oferta real.</small>
+        </div>
+      </form>
+      <div class="calc-out">
+        <h3>Cuota mensual estimada</h3>
+        <div class="calc-monthly"><span id="o-quota">—</span><small> /mes</small></div>
+        <ul class="calc-lines">
+          <li><span>Importe financiado</span><strong id="o-amount">—</strong></li>
+          <li><span>Plazo</span><strong id="o-term">—</strong></li>
+          <li><span>Interés orientativo (TIN)</span><strong id="o-rate">—</strong></li>
+          <li><span>Total a plazos (sin entrada)</span><strong id="o-total">—</strong></li>
+          <li><span>Intereses estimados</span><strong id="o-int">—</strong></li>
+        </ul>
+        <a class="btn btn--primary btn--block" href="#solicitar" style="margin-bottom:20px">Solicitar información</a>
+        <p class="disclaimer"><span data-icon="info"></span><span><strong>Simulación orientativa. Las condiciones definitivas dependerán de la entidad financiera y de la aprobación de la operación.</strong> El cálculo no incluye comisiones, seguros ni otros gastos, y no constituye una oferta vinculante.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section section--soft">
+  <div class="container">
+    <div class="section-head reveal"><div><span class="eyebrow">Cómo funciona</span><h2>Solicitar financiación es sencillo</h2></div></div>
+    <div class="features" style="grid-template-columns:repeat(3,1fr)">
+      <div class="feature reveal"><div class="feature-ico" data-icon="car"></div><h3>1. Elige tu vehículo</h3><p>Selecciona el vehículo que te interesa y simula una cuota orientativa.</p></div>
+      <div class="feature reveal reveal-d1"><div class="feature-ico" data-icon="mail"></div><h3>2. Envíanos tu solicitud</h3><p>Déjanos tus datos y te informamos de las opciones disponibles.</p></div>
+      <div class="feature reveal reveal-d2"><div class="feature-ico" data-icon="check"></div><h3>3. Estudio de la operación</h3><p>La entidad financiera estudia la operación y, si la aprueba, te comunica las condiciones definitivas.</p></div>
+    </div>
+    <p class="muted small center" style="margin-top:28px">Entidades financieras colaboradoras y documentación requerida: <span class="tbc">[DATO A CONFIRMAR]</span></p>
+  </div>
+</section>
+<section class="section" id="solicitar">
+  <div class="container split" style="align-items:start">
+    <div class="reveal">
+      <span class="eyebrow">Solicitud</span>
+      <h2>Solicita información sobre financiación</h2>
+      <p>Cuéntanos qué vehículo te interesa y el importe aproximado que necesitas. Te contactaremos para explicarte las opciones disponibles, sin compromiso.</p>
+      <ul class="checklist">
+        <li data-icon="check">Sin compromiso</li>
+        <li data-icon="check">Atención personalizada</li>
+        <li data-icon="check">Respuesta por teléfono, email o WhatsApp</li>
+      </ul>
+      <button class="btn btn--wa" data-action="whatsapp" data-msg="Hola, me gustaría recibir información sobre la financiación de un vehículo en Gabriel Automoción." data-icon="whatsapp">Preguntar por WhatsApp</button>
+    </div>
+    <div class="form-card reveal reveal-d1">
+      <form data-lead="financiacion" class="form-grid" id="financeForm">
+        <div class="field"><label for="ff-nombre">Nombre *</label><input class="input" id="ff-nombre" name="nombre" autocomplete="name" required></div>
+        <div class="field"><label for="ff-tel">Teléfono *</label><input class="input" id="ff-tel" name="telefono" type="tel" inputmode="tel" autocomplete="tel" required></div>
+        <div class="field full"><label for="ff-email">Email *</label><input class="input" id="ff-email" name="email" type="email" autocomplete="email" required></div>
+        <div class="field full"><label for="ff-veh">Vehículo</label><select class="select" id="ff-veh" name="vehiculoTitulo"><option value="">Aún no lo he decidido</option></select></div>
+        <div class="field full"><label for="ff-imp">Importe aproximado a financiar</label><div class="input-suffix"><input class="input" id="ff-imp" name="importe" type="number" inputmode="numeric" min="0" step="100" placeholder="Ej. 15000"><span>€</span></div></div>
+        <div class="full"><div data-privacy></div></div>
+        <div class="full"><button class="btn btn--dark btn--lg btn--block" type="submit">Solicitar información</button></div>
+      </form>
+    </div>
+  </div>
+</section>
+<section class="section section--soft">
+  <div class="container container--narrow">
+    <div class="section-head reveal"><div><span class="eyebrow">Preguntas frecuentes</span><h2>Dudas habituales</h2></div></div>
+    <div class="faq reveal">
+      <details><summary>¿La simulación es una oferta de financiación?</summary><p>No. La calculadora ofrece una estimación orientativa. Las condiciones definitivas dependerán de la entidad financiera y de la aprobación de la operación.</p></details>
+      <details><summary>¿Qué documentación necesito?</summary><p>La documentación concreta la indica la entidad financiera en cada caso. <span class="tbc">[DATO A CONFIRMAR]</span></p></details>
+      <details><summary>¿Puedo dar una entrada?</summary><p>Sí, puedes indicar una entrada en la calculadora para ver cómo afecta a la cuota orientativa. Las condiciones finales dependerán de la entidad financiera.</p></details>
+      <details><summary>¿Puedo entregar mi vehículo actual?</summary><p>Consulta las opciones de tasación de tu vehículo. Condiciones: <span class="tbc">[DATO A CONFIRMAR]</span></p></details>
+    </div>
+  </div>
+</section>
+</main>
+<div id="app-footer"></div>
+<script src="js/config.js"></script>
+<script src="js/demo-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/pages/finance.js"></script>
+</body>
+</html>
