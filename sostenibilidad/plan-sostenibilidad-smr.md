@@ -1,7 +1,7 @@
 # Plan de Sostenibilidad (SASP) – Sector SMR
 
-**Ciclo:** Formación Profesional de Grado Medio – Sistemas Microinformáticos y Redes
-**Empresa elegida:** *ReconectaTIC, S.L.* (empresa ficticia)
+**Ciclo:** Formación Profesional de Grado Medio – Sistemas Microinformáticos y Redes  
+**Empresa elegida:** *ReconectaTIC, S.L.* (empresa ficticia)  
 **Enfoque:** Ambiental, Social y de Gobernanza (ASG / ESG)
 
 > El plan es una hoja de ruta para que la empresa trabaje de forma responsable, sin dañar el planeta ni a las generaciones futuras.
@@ -25,6 +25,7 @@
 Además, la **Gobernanza** (la "G" de ASG) trata de *cómo se dirige la empresa*: ética, transparencia, cumplimiento de la ley (RGPD, normativa de residuos) y seguridad de la información.
 
 **¿Por qué le importa a la empresa?**
+
 - **Competitividad:** consume menos energía y material, así que gasta menos.
 - **Imagen:** los clientes, sobre todo empresas y administraciones, cada vez piden proveedores responsables.
 - **Cumplimiento legal:** la normativa de RAEE y protección de datos obliga, y las sanciones son caras.
@@ -108,6 +109,7 @@ Valoramos cada impacto del **1 (bajo) al 3 (alto)** según su **gravedad** y lo 
 | Agua | 1 | 1 | **1** | 🟢 Muy baja |
 
 **Conclusión del diagnóstico:**
+
 - Como **taller de reparación**, nuestra mayor huella es la de **residuos electrónicos (e-waste)**. Al mismo tiempo, reparar es nuestra mayor *ventaja* sostenible, porque alarga la vida de los aparatos.
 - Como **empresa de soporte y redes**, nuestro mayor riesgo es de **gobernanza**: la **protección de los datos** de los clientes.
 - Le sigue la **huella de carbono**, por la electricidad y el transporte.
@@ -172,6 +174,7 @@ Los objetivos son **SMART**: concretos, medibles, alcanzables, relevantes y con 
 **Herramientas de seguimiento:** una hoja de cálculo compartida (un panel con los KPI que se actualiza cada mes), los certificados del gestor de residuos y las facturas.
 
 **Calendario:**
+
 - **Mensual:** el "referente verde" actualiza los datos.
 - **Trimestral:** reunión del equipo; se revisan los semáforos 🟢🟡🔴 y se corrigen las acciones que van retrasadas.
 - **Anual:** se redacta una memoria de sostenibilidad sencilla y se fijan los objetivos del año siguiente (mejora continua, ciclo **PDCA**: Planificar → Hacer → Verificar → Actuar).
@@ -187,6 +190,7 @@ Los objetivos son **SMART**: concretos, medibles, alcanzables, relevantes y con 
 | **Administración y clientes grandes** | Datos verificables | Memoria anual de sostenibilidad de 2–4 páginas con los KPI reales |
 
 **Reglas para comunicar bien (sin *greenwashing*):**
+
 1. Decir solo lo que se puede **demostrar con datos**.
 2. Contar también lo que **no** se ha conseguido y por qué.
 3. No usar expresiones vagas del tipo "100 % ecológicos" o "empresa verde" si no se pueden justificar.
