@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "description": "Web de Gabriel Automoción: catálogo de vehículos, financiación, contacto y panel de gestión de stock. Funciona con server.js o en Vercel.",
-  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js"
