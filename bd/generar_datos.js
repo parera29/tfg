@@ -89,10 +89,10 @@ w('SELECT v.id, x.url, x.orden FROM (VALUES');
 w(demo.flatMap((v) => v.fotos.map((f, i) => `    (${q(v.id)}, ${q(f)}, ${i + 1})`)).join(',\n'));
 w(') AS x(ref, url, orden) JOIN vehiculo v ON v.referencia = x.ref;');
 w();
-w('INSERT INTO vehiculo_equipamiento (vehiculo_id, equipamiento_id)');
-w('SELECT v.id, e.id FROM (VALUES');
-w(demo.flatMap((v) => v.equipamiento.map((e) => `    (${q(v.id)}, ${q(e)})`)).join(',\n'));
-w(') AS x(ref, equipo) JOIN vehiculo v ON v.referencia = x.ref JOIN equipamiento e ON e.nombre = x.equipo;');
+w('INSERT INTO vehiculo_equipamiento (vehiculo_id, equipamiento_id, orden)');
+w('SELECT v.id, e.id, x.orden FROM (VALUES');
+w(demo.flatMap((v) => v.equipamiento.map((e, i) => `    (${q(v.id)}, ${q(e)}, ${i + 1})`)).join(',\n'));
+w(') AS x(ref, equipo, orden) JOIN vehiculo v ON v.referencia = x.ref JOIN equipamiento e ON e.nombre = x.equipo;');
 w();
 
 /* ---- Actividad de ejemplo de los clientes ---- */

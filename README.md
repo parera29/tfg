@@ -7,28 +7,29 @@ Web **demo funcional** para el concesionario Gabriel Automoción: catálogo de v
 ## Puesta en marcha
 
 ### Opción A — En Vercel (recomendada para tenerla en internet)
-Vercel publica la web automáticamente cada vez que se sube un cambio a GitHub. Como Vercel no tiene disco permanente, el stock y las solicitudes se guardan en **Upstash Redis** y las fotos en **Vercel Blob** (los dos tienen plan gratuito suficiente para esta web). La API está en `api/router.js` y comparte toda la lógica con `server.js` (`lib/api.js`).
+Vercel publica la web automáticamente cada vez que se sube un cambio a GitHub. Como Vercel no tiene disco permanente, los datos se guardan en una base de datos **PostgreSQL en Neon** (diseño en [`bd/`](bd/README.md)) y las fotos en **Vercel Blob** (los dos tienen plan gratuito suficiente para esta web). La API está en `api/router.js` y comparte toda la lógica con `server.js` (`lib/api.js`).
 
 1. En [vercel.com](https://vercel.com), entra con tu cuenta de GitHub → **Add New → Project** → importa este repositorio → **Deploy** (no hay que cambiar ningún ajuste).
 2. En el proyecto, pestaña **Storage**:
-   - **Create Database → Upstash for Redis** (plan gratuito) → **Connect** al proyecto.
+   - **Create Database → Neon** (Serverless Postgres, plan gratuito, región Frankfurt o la más cercana) → **Connect** al proyecto. La primera vez que arranca, la web crea sola las tablas de `bd/01_esquema.sql` y carga los vehículos DEMO.
    - **Create → Blob** → elige acceso **Public** → **Connect** al proyecto.
 3. En **Settings → Environment Variables** añade `ADMIN_PASSWORD` con la contraseña que quieras para el panel. Opcional: `LEAD_WEBHOOK_URL`.
 4. En **Deployments**, en el último despliegue, pulsa **⋯ → Redeploy** para que coja las variables nuevas.
 
-Comprobación: `https://TU-PROYECTO.vercel.app/api/health` debe responder `{"ok":true,"storage":"vercel"}`. Si falta algo, la web sigue funcionando en modo demostración y el panel dice qué falta conectar.
+Comprobación: `https://TU-PROYECTO.vercel.app/api/health` debe responder `{"ok":true,"storage":"postgresql"}`. Si falta algo, la web sigue funcionando en modo demostración y el panel dice qué falta conectar.
 
 ### Opción B — Con servidor propio (ordenador, VPS, Render, Railway)
-Requiere Node.js 18 o superior. **No hay dependencias que instalar** para este modo.
+Requiere Node.js 18 o superior.
 
 ```bash
-ADMIN_PASSWORD="una-contraseña-segura" npm start
+npm install
+ADMIN_PASSWORD="una-contraseña-segura" DATABASE_URL="postgres://usuario:clave@localhost:5432/gabriel" npm start
 # Web:   http://localhost:3000
 # Panel: http://localhost:3000/admin.html
 ```
 
-- El stock se guarda en `data/vehicles.json` (se crea con los vehículos DEMO la primera vez).
-- Las solicitudes de los formularios se guardan en `data/leads.json` y se ven en el panel.
+- Con `DATABASE_URL`, todo se guarda en PostgreSQL (las tablas se crean solas si la base de datos está vacía).
+- Sin `DATABASE_URL`, para probar sin instalar nada, el stock se guarda en `data/vehicles.json` y las solicitudes en `data/leads.json`.
 - Las fotos subidas se optimizan en el navegador y se guardan en `uploads/`.
 - Opcional: `LEAD_WEBHOOK_URL=https://…` envía cada solicitud nueva a un webhook (Make, Zapier, n8n…) para recibirla por email.
 
@@ -80,8 +81,11 @@ js/store.js   capa de datos (servidor o navegador)
 js/ui.js      cabecera, pie, tarjetas, WhatsApp, formularios…
 js/pages/     lógica de cada página
 server.js     servidor sin dependencias (API + estáticos) para ordenador o VPS
-api/router.js API para Vercel (Upstash Redis + Vercel Blob)
+api/router.js API para Vercel (Neon PostgreSQL + Vercel Blob)
 lib/api.js    lógica común de la API (validación, acceso, stock, solicitudes)
+lib/store-pg.js     almacén PostgreSQL (traduce entre la web y las tablas)
+lib/store-lists.js  almacén en archivos JSON (sin base de datos)
+bd/           diseño de la base de datos: esquema, datos, consultas, pruebas y diagrama E/R
 vercel.json   reescritura /api/* → api/router.js y cabeceras
 fonts/        tipografías Inter y Sora autoalojadas (SIL OFL)
 media/        vídeo e imagen de la portada

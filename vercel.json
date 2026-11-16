@@ -9,7 +9,7 @@
   ],
   "functions": {
     "api/router.js": {
-      "includeFiles": "js/demo-data.js",
+      "includeFiles": "{js/demo-data.js,bd/01_esquema.sql}",
       "maxDuration": 15
     }
   },

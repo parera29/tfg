@@ -11,7 +11,7 @@ SET client_min_messages = warning;
 
 BEGIN;
 
-DROP TABLE IF EXISTS mensaje, conversacion, solicitud, aviso, favorito, sesion,
+DROP TABLE IF EXISTS limite_peticion, mensaje, conversacion, solicitud, aviso, favorito, sesion,
                      vehiculo_equipamiento, equipamiento, foto, vehiculo,
                      modelo, marca, combustible, carroceria,
                      cliente, administrador CASCADE;
@@ -38,7 +38,7 @@ CREATE TABLE cliente (
     id                   SERIAL       PRIMARY KEY,
     nombre               VARCHAR(120) NOT NULL,
     email                VARCHAR(160) NOT NULL,
-    telefono             VARCHAR(20),                -- opcional en el registro
+    telefono             VARCHAR(40),                -- opcional en el registro
     password_hash        VARCHAR(255) NOT NULL,
     privacidad_aceptada  TIMESTAMPTZ  NOT NULL,      -- RGPD: cuándo aceptó la política
     acepta_comunicaciones BOOLEAN     NOT NULL DEFAULT FALSE,
@@ -107,7 +107,7 @@ CREATE TABLE vehiculo (
     etiqueta         VARCHAR(12)   NOT NULL CHECK (etiqueta IN ('0', 'ECO', 'C', 'B', 'Sin etiqueta')),
     precio           NUMERIC(10,2) NOT NULL CHECK (precio > 0),
     precio_anterior  NUMERIC(10,2),                   -- para mostrar «antes 30.500 €»
-    anio             SMALLINT      NOT NULL CHECK (anio BETWEEN 1950 AND 2100),
+    anio             SMALLINT      CHECK (anio BETWEEN 1950 AND 2100),
     km               INT           NOT NULL DEFAULT 0 CHECK (km >= 0),
     potencia_cv      SMALLINT      CHECK (potencia_cv > 0),
     color            VARCHAR(40),
@@ -145,6 +145,7 @@ CREATE TABLE equipamiento (
 CREATE TABLE vehiculo_equipamiento (
     vehiculo_id      INT NOT NULL REFERENCES vehiculo(id)     ON DELETE CASCADE,
     equipamiento_id  INT NOT NULL REFERENCES equipamiento(id) ON DELETE RESTRICT,
+    orden            SMALLINT NOT NULL DEFAULT 1,   -- orden en que se muestra en la ficha
     PRIMARY KEY (vehiculo_id, equipamiento_id)
 );
 CREATE INDEX ix_veheq_equipamiento ON vehiculo_equipamiento (equipamiento_id);
@@ -196,7 +197,7 @@ CREATE TABLE solicitud (
     motivo            VARCHAR(60),                  -- Información / Prueba del vehículo / Financiación
     asunto            VARCHAR(80),
     nombre            VARCHAR(120)  NOT NULL,
-    telefono          VARCHAR(20),
+    telefono          VARCHAR(40),
     email             VARCHAR(160),
     mensaje           TEXT,
     importe           NUMERIC(10,2),                -- importe a financiar, si lo hay
@@ -243,6 +244,14 @@ CREATE TABLE mensaje (
     CONSTRAINT ck_mensaje_autor CHECK (autor = 'concesionario' OR administrador_id IS NULL)
 );
 CREATE INDEX ix_mensaje_conversacion ON mensaje (conversacion_id, enviado);
+
+-- Tabla técnica: limita intentos de inicio de sesión y envíos de formularios
+-- por IP (p. ej. 10 intentos cada 15 minutos). No forma parte del modelo E/R.
+CREATE TABLE limite_peticion (
+    clave     VARCHAR(120) PRIMARY KEY,               -- 'login:1.2.3.4', 'lead:1.2.3.4'
+    contador  INT          NOT NULL,
+    reinicio  TIMESTAMPTZ  NOT NULL
+);
 
 -- ----------------------------------------------------------------------------
 --  5. AUTOMATISMOS

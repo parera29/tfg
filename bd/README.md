@@ -8,7 +8,7 @@ SGBD elegido: **PostgreSQL 16**. Es gratuito, cumple el estándar SQL, tiene res
 
 | Archivo | Qué contiene |
 | --- | --- |
-| [`01_esquema.sql`](01_esquema.sql) | Creación de las 16 tablas con sus claves, restricciones, índices, 2 disparadores y 2 vistas |
+| [`01_esquema.sql`](01_esquema.sql) | Creación de las 16 tablas (más una técnica para limitar intentos) con sus claves, restricciones, índices, 2 disparadores y 2 vistas |
 | [`02_datos.sql`](02_datos.sql) | Datos de ejemplo: los 14 vehículos de la web (con fotos y equipamiento), 2 administradores, 3 clientes, solicitudes y una conversación |
 | [`03_consultas.sql`](03_consultas.sql) | 12 consultas que necesita cada pantalla de la web (catálogo, ficha, panel, Mi cuenta, mensajes…) |
 | [`04_pruebas.sql`](04_pruebas.sql) | 17 pruebas de integridad: datos que la base de datos debe rechazar y comprobación de los disparadores |
@@ -26,6 +26,18 @@ psql -d gabriel -f bd/04_pruebas.sql     # debe mostrar 17 líneas «OK» y no c
 ```
 
 Contraseña de todas las cuentas de ejemplo: `demo1234` (guardada con scrypt, nunca en claro).
+
+## Conexión con la web
+
+La web ya usa esta base de datos:
+
+- **En Vercel**, `api/router.js` se conecta a Neon con la variable `DATABASE_URL` (o `POSTGRES_URL`), que Vercel crea al conectar la base de datos.
+- **En un ordenador**, `server.js` la usa si se arranca con `DATABASE_URL=postgres://…`. Sin ella, guarda en archivos JSON.
+- La primera vez que la web se conecta a una base de datos vacía, crea las tablas con `01_esquema.sql` y carga los 14 vehículos DEMO (sin los clientes ni mensajes de ejemplo de `02_datos.sql`).
+- `lib/store-pg.js` traduce entre el formato de la web (un vehículo con sus fotos y su equipamiento dentro) y las tablas. Si la marca, el modelo o un extra no existen, los crea.
+- Las restricciones de la base de datos llegan al panel como mensajes claros (por ejemplo, «El precio debe ser mayor que 0»).
+- La tabla técnica `limite_peticion` guarda los intentos de inicio de sesión y de envío de formularios por IP, para frenar ataques de fuerza bruta.
+- Las tablas de clientes, sesiones, favoritos, avisos y mensajes ya existen, pero la web aún no las usa: son para las cuentas de clientes y la sección Mensajes, que están pendientes. El panel sigue entrando con la contraseña `ADMIN_PASSWORD` hasta entonces.
 
 ## Modelo entidad-relación
 
@@ -111,7 +123,7 @@ Clave primaria subrayada en el diagrama; aquí, **PK** y **FK**.
 - **vehiculo**(**id** PK, referencia UNIQUE, modelo_id FK, version, combustible_id FK, carroceria_id FK, tipo, cambio, etiqueta, precio, precio_anterior, anio, km, potencia_cv, color, descripcion, estado, destacado, oculto, demo, creado_por FK, creado, actualizado)
 - **foto**(**id** PK, vehiculo_id FK, url, orden, subida) · UNIQUE(vehiculo_id, orden)
 - **equipamiento**(**id** PK, nombre UNIQUE)
-- **vehiculo_equipamiento**(**vehiculo_id** PK FK, **equipamiento_id** PK FK)
+- **vehiculo_equipamiento**(**vehiculo_id** PK FK, **equipamiento_id** PK FK, orden)
 - **favorito**(**cliente_id** PK FK, **vehiculo_id** PK FK, guardado)
 - **aviso**(**id** PK, cliente_id FK, tipo, vehiculo_id FK, marca_id FK, combustible_id FK, precio_max, km_max, activo, creado, ultimo_envio)
 - **solicitud**(**id** PK, tipo, motivo, asunto, nombre, telefono, email, mensaje, importe, pagina, cliente_id FK, vehiculo_id FK, vehiculo_titulo, privacidad, estado, nota_interna, atendida_por FK, fecha, ip)
@@ -153,5 +165,6 @@ Dos excepciones a propósito:
 | `v.equipamiento[]` | `equipamiento` + `vehiculo_equipamiento` |
 | `v.potencia`, `v.precioAnterior`, `v.anio` | `potencia_cv`, `precio_anterior`, `anio` |
 | `leads` | `solicitud` (`nota` → `nota_interna`) |
-| Contraseña única `ADMIN_PASSWORD` | `administrador` (una cuenta por persona) |
+| Contraseña única `ADMIN_PASSWORD` | `administrador` (una cuenta por persona, cuando se hagan las cuentas) |
+| Límite de intentos en Redis | `limite_peticion` |
 | *(no existe todavía)* | `cliente`, `sesion`, `favorito`, `aviso`, `conversacion`, `mensaje` |

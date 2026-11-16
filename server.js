@@ -4,13 +4,16 @@
    Para usar la web en un ordenador o en un servidor propio (VPS, Render, Railway).
    - Sirve la web estática.
    - API REST para el panel de administración (lógica en lib/api.js).
-   - Persistencia en archivos JSON (data/) y fotos en uploads/.
+   - Datos en PostgreSQL si se define DATABASE_URL (ver bd/README.md);
+     si no, en archivos JSON (data/), útil para probar sin instalar nada.
+   - Fotos en uploads/.
    En Vercel no se usa este archivo: allí la API es api/router.js.
 
    Uso:   ADMIN_PASSWORD="una-contraseña-segura" node server.js
    Variables de entorno:
      PORT              Puerto (por defecto 3000)
      ADMIN_PASSWORD    Contraseña del panel (por defecto "demo" — CAMBIAR)
+     DATABASE_URL      (opcional) postgres://usuario:clave@host:5432/gabriel
      LEAD_WEBHOOK_URL  (opcional) URL a la que se envía cada solicitud nueva
                        en JSON (p. ej. Make, Zapier, n8n) para recibirla por email.
    ========================================================================== */
@@ -21,6 +24,7 @@ const fsp = fs.promises;
 const path = require('path');
 const crypto = require('crypto');
 const api = require('./lib/api');
+const { createListStore } = require('./lib/store-lists');
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, 'data');
@@ -63,12 +67,17 @@ function writeJson(file, data) {
 let vehicles = readJson(VEH_FILE);
 let leads = readJson(LEADS_FILE);
 const buckets = new Map();
-const fileStore = {
-  name: 'archivos',
-  async getVehicles() { return vehicles ? JSON.parse(JSON.stringify(vehicles)) : null; },
-  async setVehicles(list) { vehicles = list; await writeJson(VEH_FILE, list); },
-  async getLeads() { return leads ? JSON.parse(JSON.stringify(leads)) : []; },
-  async setLeads(list) { leads = list; await writeJson(LEADS_FILE, list); },
+// Datos: PostgreSQL si hay DATABASE_URL; si no, las dos listas en data/*.json.
+const dataStore = process.env.DATABASE_URL
+  ? require('./lib/store-pg').createPgStore(process.env.DATABASE_URL, api.httpError)
+  : createListStore({
+    async getVehicles() { return vehicles ? JSON.parse(JSON.stringify(vehicles)) : null; },
+    async setVehicles(list) { vehicles = list; await writeJson(VEH_FILE, list); },
+    async getLeads() { return leads ? JSON.parse(JSON.stringify(leads)) : []; },
+    async setLeads(list) { leads = list; await writeJson(LEADS_FILE, list); }
+  });
+const fileStore = Object.assign({}, dataStore, {
+  name: process.env.DATABASE_URL ? 'postgresql' : 'archivos',
   async savePhoto(buf, ext) {
     const name = Date.now().toString(36) + '-' + crypto.randomBytes(6).toString('hex') + '.' + ext;
     await fsp.writeFile(path.join(UPLOAD_DIR, name), buf);
@@ -87,7 +96,7 @@ const fileStore = {
     buckets.set(key, b);
     return b.n <= max;
   }
-};
+});
 setInterval(() => {
   const now = Date.now();
   for (const [k, b] of buckets) if (now > b.reset) buckets.delete(k);
