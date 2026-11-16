@@ -1,0 +1,169 @@
+erDiagram
+    MARCA ||--o{ MODELO : tiene
+    MODELO ||--o{ VEHICULO : "es de"
+    COMBUSTIBLE ||--o{ VEHICULO : usa
+    CARROCERIA ||--o{ VEHICULO : tiene
+    VEHICULO ||--o{ FOTO : tiene
+    VEHICULO ||--o{ VEHICULO_EQUIPAMIENTO : incluye
+    EQUIPAMIENTO ||--o{ VEHICULO_EQUIPAMIENTO : "esta en"
+    ADMINISTRADOR |o--o{ VEHICULO : "da de alta"
+    CLIENTE ||--o{ FAVORITO : guarda
+    VEHICULO ||--o{ FAVORITO : "es guardado"
+    CLIENTE ||--o{ AVISO : crea
+    VEHICULO |o--o{ AVISO : vigila
+    CLIENTE |o--o{ SOLICITUD : envia
+    VEHICULO |o--o{ SOLICITUD : "trata de"
+    ADMINISTRADOR |o--o{ SOLICITUD : atiende
+    CLIENTE ||--o{ CONVERSACION : abre
+    VEHICULO |o--o{ CONVERSACION : "trata de"
+    SOLICITUD |o--o| CONVERSACION : origina
+    CONVERSACION ||--|{ MENSAJE : contiene
+    ADMINISTRADOR |o--o{ MENSAJE : escribe
+    CLIENTE |o--o{ SESION : inicia
+    ADMINISTRADOR |o--o{ SESION : inicia
+
+    MARCA {
+        int id PK
+        varchar nombre UK
+    }
+    MODELO {
+        int id PK
+        int marca_id FK
+        varchar nombre
+    }
+    COMBUSTIBLE {
+        int id PK
+        varchar nombre UK
+    }
+    CARROCERIA {
+        int id PK
+        varchar nombre UK
+    }
+    VEHICULO {
+        int id PK
+        varchar referencia UK
+        int modelo_id FK
+        int combustible_id FK
+        int carroceria_id FK
+        varchar version
+        varchar tipo
+        varchar cambio
+        varchar etiqueta
+        numeric precio
+        numeric precio_anterior
+        smallint anio
+        int km
+        smallint potencia_cv
+        varchar color
+        text descripcion
+        varchar estado
+        boolean destacado
+        boolean oculto
+        boolean demo
+        int creado_por FK
+        timestamptz creado
+        timestamptz actualizado
+    }
+    FOTO {
+        int id PK
+        int vehiculo_id FK
+        varchar url
+        smallint orden
+        timestamptz subida
+    }
+    EQUIPAMIENTO {
+        int id PK
+        varchar nombre UK
+    }
+    VEHICULO_EQUIPAMIENTO {
+        int vehiculo_id PK,FK
+        int equipamiento_id PK,FK
+    }
+    ADMINISTRADOR {
+        int id PK
+        varchar nombre
+        varchar email UK
+        varchar password_hash
+        varchar rol
+        boolean activo
+        timestamptz creado
+        timestamptz ultimo_acceso
+    }
+    CLIENTE {
+        int id PK
+        varchar nombre
+        varchar email UK
+        varchar telefono
+        varchar password_hash
+        timestamptz privacidad_aceptada
+        boolean acepta_comunicaciones
+        boolean activo
+        timestamptz fecha_alta
+        timestamptz ultimo_acceso
+    }
+    SESION {
+        char token_hash PK
+        int cliente_id FK
+        int administrador_id FK
+        timestamptz creada
+        timestamptz expira
+        inet ip
+        varchar user_agent
+    }
+    FAVORITO {
+        int cliente_id PK,FK
+        int vehiculo_id PK,FK
+        timestamptz guardado
+    }
+    AVISO {
+        int id PK
+        int cliente_id FK
+        varchar tipo
+        int vehiculo_id FK
+        int marca_id FK
+        int combustible_id FK
+        numeric precio_max
+        int km_max
+        boolean activo
+        timestamptz creado
+        timestamptz ultimo_envio
+    }
+    SOLICITUD {
+        int id PK
+        varchar tipo
+        varchar motivo
+        varchar asunto
+        varchar nombre
+        varchar telefono
+        varchar email
+        text mensaje
+        numeric importe
+        varchar pagina
+        int cliente_id FK
+        int vehiculo_id FK
+        varchar vehiculo_titulo
+        boolean privacidad
+        varchar estado
+        text nota_interna
+        int atendida_por FK
+        timestamptz fecha
+        inet ip
+    }
+    CONVERSACION {
+        int id PK
+        int cliente_id FK
+        int vehiculo_id FK
+        int solicitud_id FK,UK
+        varchar asunto
+        varchar estado
+        timestamptz creada
+    }
+    MENSAJE {
+        int id PK
+        int conversacion_id FK
+        varchar autor
+        int administrador_id FK
+        text texto
+        timestamptz enviado
+        timestamptz leido
+    }
