@@ -12,6 +12,7 @@
   },
   "license": "UNLICENSED",
   "dependencies": {
-    "@vercel/blob": "2.8.2"
+    "@vercel/blob": "2.8.2",
+    "pg": "8.23.1"
   }
 }
