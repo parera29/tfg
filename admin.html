@@ -6,7 +6,10 @@
 <title>Gestión de stock · Gabriel Automoción</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0c0e12">
-<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="img/favicon.ico?v=2" sizes="any">
+<link rel="icon" href="img/favicon-32.png?v=2" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png?v=2">
+<link rel="manifest" href="site.webmanifest?v=2">
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -15,7 +18,7 @@
 <!-- Acceso -->
 <section class="login" id="login" hidden>
   <form class="login-card" id="loginForm">
-    <a class="logo" href="index.html"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M29 13.5A11 11 0 1 0 31 22H20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg></span><span class="logo-text"><strong>GABRIEL</strong><small>AUTOMOCIÓN</small></span></a>
+    <a class="logo" href="index.html"><span class="logo-mark" aria-hidden="true"><img src="img/logo-mark.webp?v=2" alt="" width="42" height="42"></span><span class="logo-text"><strong>GABRIEL</strong><small>AUTOMOCIÓN</small></span></a>
     <h1>Panel de gestión</h1>
     <p class="muted">Accede para gestionar el stock de vehículos y las solicitudes recibidas.</p>
     <div class="field"><label for="pw">Contraseña</label><input class="input" type="password" id="pw" autocomplete="current-password" required autofocus></div>
@@ -28,7 +31,7 @@
 <!-- Aplicación -->
 <div class="admin" id="app" hidden>
   <aside class="admin-side">
-    <a class="logo logo--light" href="index.html"><span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M29 13.5A11 11 0 1 0 31 22H20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg></span><span class="logo-text"><strong>GABRIEL</strong><small>GESTIÓN</small></span></a>
+    <a class="logo logo--light" href="index.html"><span class="logo-mark" aria-hidden="true"><img src="img/logo-mark.webp?v=2" alt="" width="42" height="42"></span><span class="logo-text"><strong>GABRIEL</strong><small>GESTIÓN</small></span></a>
     <nav class="admin-nav">
       <button class="is-active" data-view="stock" data-icon="car">Stock</button>
       <button data-view="leads" data-icon="inbox">Solicitudes <span class="badge" id="leadBadge" hidden></span></button>
@@ -183,8 +186,8 @@
 
 <script src="js/config.js"></script>
 <script src="js/demo-data.js"></script>
-<script src="js/store.js"></script>
-<script src="js/ui.js"></script>
-<script src="js/pages/admin.js"></script>
+<script src="js/store.js?v=4"></script>
+<script src="js/ui.js?v=3"></script>
+<script src="js/pages/admin.js?v=4"></script>
 </body>
 </html>

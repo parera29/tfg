@@ -1,0 +1,5 @@
+# No se publican en Vercel
+promo/
+data/
+uploads/
+server.js

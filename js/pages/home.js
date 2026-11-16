@@ -1,4 +1,48 @@
-/* Página de inicio: destacados, buscador rápido y accesos por categoría */
+/* Página de inicio: vídeo de portada, destacados, buscador rápido y accesos por categoría */
+
+/* --- Vídeo de fondo de la portada ---
+   Solo se descarga si el usuario no ha pedido reducir movimiento ni ahorro de datos;
+   en ese caso se queda la imagen fija. Versión de 640 px en móvil y 1280 px en el resto. */
+(function () {
+  var v = document.getElementById('heroVideo');
+  var btn = document.getElementById('heroToggle');
+  if (!v) return;
+  var conn = navigator.connection || {};
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || conn.saveData || /2g$/.test(conn.effectiveType || '')) return;
+
+  var small = window.matchMedia('(max-width: 640px)').matches;
+  var base = 'media/hero-' + (small ? '640' : '1280');
+  v.poster = 'media/hero-poster' + (small ? '-640' : '') + '.jpg?v=2';
+  v.innerHTML = '<source src="' + base + '.webm?v=2" type="video/webm"><source src="' + base + '.mp4?v=2" type="video/mp4">';
+  v.muted = true;
+  v.preload = 'auto';
+
+  var userPaused = false;
+  function paint() {
+    btn.innerHTML = UI.icon(v.paused ? 'play' : 'pause');
+    btn.setAttribute('aria-label', v.paused ? 'Reproducir vídeo de fondo' : 'Pausar vídeo de fondo');
+  }
+  function play() { var p = v.play(); if (p && p.catch) p.catch(paint); }
+  v.addEventListener('playing', function () { v.classList.add('is-playing'); });
+  v.addEventListener('play', paint);
+  v.addEventListener('pause', paint);
+  btn.hidden = false;
+  btn.addEventListener('click', function () {
+    userPaused = !v.paused;
+    if (userPaused) v.pause(); else play();
+  });
+  paint();
+  v.load();
+  play();
+  // pausa el vídeo cuando no está a la vista (ahorra batería y datos)
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (!e.isIntersecting) v.pause(); else if (!userPaused) play(); });
+    }).observe(v);
+  }
+})();
+
 (async function () {
   var featuredEl = document.getElementById('featured');
   featuredEl.innerHTML = UI.skeletonCards(6);

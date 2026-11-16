@@ -77,6 +77,8 @@
     grid: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>',
     inbox: '<path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"/>',
     download: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+    play: '<path fill="currentColor" d="M8 5v14l11-7z"/>',
+    pause: '<path d="M9 5v14M15 5v14" stroke-width="2.4"/>',
     refresh: '<path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.8-3.4L23 10M1 14l4.7 4.4A9 9 0 0 0 20.5 15"/>'
   };
   function icon(name, cls) {
@@ -226,7 +228,7 @@
   ];
   function logo(light) {
     return '<a class="logo' + (light ? ' logo--light' : '') + '" href="index.html" aria-label="' + esc(S.NAME) + ' — Inicio">' +
-      '<span class="logo-mark" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M29 13.5A11 11 0 1 0 31 22H20" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg></span>' +
+      '<span class="logo-mark" aria-hidden="true"><img src="img/logo-mark.webp?v=2" alt="" width="42" height="42"></span>' +
       '<span class="logo-text"><strong>GABRIEL</strong><small>AUTOMOCIÓN</small></span></a>';
   }
   function renderLayout() {
@@ -272,7 +274,7 @@
         '<div class="footer-cta"><div><h2>¿Has visto un vehículo que te interesa?</h2><p>Escríbenos y te atendemos de forma personalizada.</p></div>' +
         '<div class="footer-cta-actions"><button class="btn btn--wa" data-action="whatsapp">' + icon('whatsapp') + 'WhatsApp</button><a class="btn btn--outline-light" href="contacto.html">Contactar</a></div></div>' +
         '<div class="footer-grid">' +
-          '<div class="footer-brand">' + logo(true) + '<p>Compraventa de vehículos con atención personalizada y soluciones de financiación.</p>' +
+          '<div class="footer-brand"><a class="footer-logo" href="index.html" aria-label="' + esc(S.NAME) + ' — Inicio"><picture><source srcset="img/logo-footer.webp" type="image/webp"><img src="img/logo-footer.jpg" alt="' + esc(S.NAME) + '" width="640" height="321" loading="lazy"></picture></a>' + '<p>Compraventa de vehículos con atención personalizada y soluciones de financiación.</p>' +
             '<div class="social">' + (S.SOCIAL && S.SOCIAL.instagram ? '<a href="' + esc(S.SOCIAL.instagram) + '" aria-label="Instagram" target="_blank" rel="noopener">' + icon('instagram') + '</a>' : '') +
             (S.SOCIAL && S.SOCIAL.facebook ? '<a href="' + esc(S.SOCIAL.facebook) + '" aria-label="Facebook" target="_blank" rel="noopener">' + icon('facebook') + '</a>' : '') +
             (!(S.SOCIAL && (S.SOCIAL.instagram || S.SOCIAL.facebook)) ? '<span class="tbc">[Redes sociales: ' + TBC + ']</span>' : '') + '</div></div>' +
@@ -431,7 +433,7 @@
 
   window.UI = {
     esc: esc, price: price, money: money, km: km, tbc: tbc, qs: qs, slug: slug, monthly: monthly, group: group,
-    icon: icon, img: img, imgUrl: imgUrl, imgFallback: imgFallback, PLACEHOLDER: PLACEHOLDER,
+    icon: icon, img: img, imgUrl: imgUrl, isUnsplash: isUnsplash, imgFallback: imgFallback, PLACEHOLDER: PLACEHOLDER,
     title: title, vehicleCard: vehicleCard, skeletonCards: skeletonCards, etiquetaBadge: etiquetaBadge, statusBadge: statusBadge, sortAvailableFirst: sortAvailableFirst,
     vehicleWaMsg: vehicleWaMsg, openWhatsApp: openWhatsApp, call: call,
     modal: modal, toast: toast, confirm: confirmDialog,
