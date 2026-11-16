@@ -235,8 +235,9 @@
   });
 
   function resize(file) {
-    var max = mode === 'api' ? 1800 : 1280;
-    var q = mode === 'api' ? 0.84 : 0.72;
+    // Sin servidor las fotos se guardan dentro del navegador (unos 5 MB en total): se reducen más.
+    var max = mode === 'api' ? 1800 : 1024;
+    var q = mode === 'api' ? 0.84 : 0.68;
     return new Promise(function (resolve, reject) {
       if (!/^image\//.test(file.type)) return reject(new Error(file.name + ' no es una imagen'));
       var url = URL.createObjectURL(file);
@@ -261,17 +262,23 @@
     var dz = $('dropzone');
     dz.classList.add('is-busy');
     var ok = 0;
+    // Las fotos nuevas pasan a ser las primeras (la primera es la principal, la que se ve en la web).
+    // Si el vehículo solo tenía fotos de ejemplo (DEMO), se sustituyen por las nuevas.
+    var replacedDemo = photos.length > 0 && photos.every(UI.isUnsplash);
+    var pos = 0;
     for (var i = 0; i < files.length; i++) {
       dz.querySelector('strong').textContent = 'Procesando foto ' + (i + 1) + ' de ' + files.length + '…';
       try {
         var data = await resize(files[i]);
         var url = await guard(function () { return Store.uploadPhoto(data); });
-        photos.push(url); ok++; dirty = true; renderPhotos();
+        if (replacedDemo && pos === 0) photos = [];
+        photos.splice(pos++, 0, url); ok++; dirty = true; renderPhotos();
       } catch (err) { if (!/Sesión/.test(err.message)) UI.toast(err.message, 'error'); }
     }
     dz.classList.remove('is-busy');
     dz.querySelector('strong').textContent = 'Arrastra aquí las fotos o pulsa para seleccionarlas';
-    if (ok) UI.toast(ok + (ok === 1 ? ' foto añadida' : ' fotos añadidas'));
+    if (ok) UI.toast((ok === 1 ? 'Foto añadida como principal' : ok + ' fotos añadidas (la primera es la principal)') +
+      (replacedDemo ? '. Se han quitado las fotos de ejemplo' : '') + '. Pulsa «Guardar vehículo» para publicarlo.');
   }
   $('photoInput').addEventListener('change', function (e) { addFiles(e.target.files); e.target.value = ''; });
   ['dragenter', 'dragover'].forEach(function (ev) { $('dropzone').addEventListener(ev, function (e) { e.preventDefault(); $('dropzone').classList.add('is-over'); }); });

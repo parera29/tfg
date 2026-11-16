@@ -34,7 +34,7 @@ const MIME = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'application/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon', '.woff2': 'font/woff2',
-  '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8', '.webmanifest': 'application/manifest+json'
+  '.mp4': 'video/mp4', '.webm': 'video/webm', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8', '.webmanifest': 'application/manifest+json'
 };
 // Rutas que nunca se sirven como estáticos
 const BLOCKED = [/^\/data(\/|$)/, /^\/\./, /^\/node_modules(\/|$)/, /^\/server\.js$/, /^\/package(-lock)?\.json$/];
@@ -331,12 +331,26 @@ function streamFile(req, res, file, stat) {
   const ext = path.extname(file).toLowerCase();
   const type = MIME[ext];
   if (!type) return notFound(res);
-  const longCache = /^\.(woff2|jpg|jpeg|png|webp|svg)$/.test(ext);
-  res.writeHead(200, Object.assign({
-    'Content-Type': type, 'Content-Length': stat.size,
+  const longCache = /^\.(woff2|jpg|jpeg|png|webp|svg|mp4|webm)$/.test(ext);
+  const headers = Object.assign({
+    'Content-Type': type, 'Accept-Ranges': 'bytes',
     'Cache-Control': longCache ? 'public, max-age=604800' : 'no-cache',
     'Last-Modified': stat.mtime.toUTCString()
-  }, SEC_HEADERS));
+  }, SEC_HEADERS);
+  // Peticiones parciales (Range): necesarias para reproducir vídeo en Safari/iPhone
+  const m = /^bytes=(\d*)-(\d*)$/.exec(req.headers.range || '');
+  if (m && (m[1] || m[2])) {
+    let start = m[1] ? parseInt(m[1], 10) : Math.max(0, stat.size - parseInt(m[2], 10));
+    let end = m[1] && m[2] ? Math.min(parseInt(m[2], 10), stat.size - 1) : stat.size - 1;
+    if (start >= stat.size || start > end) {
+      res.writeHead(416, Object.assign({ 'Content-Range': 'bytes */' + stat.size }, SEC_HEADERS));
+      return res.end();
+    }
+    res.writeHead(206, Object.assign(headers, { 'Content-Range': `bytes ${start}-${end}/${stat.size}`, 'Content-Length': end - start + 1 }));
+    if (req.method === 'HEAD') return res.end();
+    return fs.createReadStream(file, { start, end }).pipe(res);
+  }
+  res.writeHead(200, Object.assign(headers, { 'Content-Length': stat.size }));
   if (req.method === 'HEAD') return res.end();
   fs.createReadStream(file).pipe(res);
 }

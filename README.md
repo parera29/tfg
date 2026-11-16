@@ -38,6 +38,14 @@ Todo se edita en **`js/config.js`**:
 | `FINANCE` | Valores iniciales de la calculadora (orientativos) |
 | `DEMO_MODE` | `false` para quitar la franja “Web de demostración” |
 
+## Vídeo de portada
+Arriba del todo de la portada se muestra en bucle el vídeo de marca de Gabriel Automoción (carpeta `media/`, 10 s, sin audio). Se ve completo en todos los tamaños de pantalla y el texto de bienvenida va debajo.
+- `hero-1280.webm` / `hero-1280.mp4` para ordenador y tablet, `hero-640.webm` / `hero-640.mp4` para móvil.
+- `hero-poster.jpg` / `hero-poster-640.jpg`: imagen fija mientras carga.
+- Si el usuario tiene activado "reducir movimiento" o el ahorro de datos, no se descarga el vídeo y se queda la imagen fija.
+- Botón para pausar el vídeo; se pausa solo cuando no está a la vista.
+- Para cambiarlo, sustituye esos archivos manteniendo los mismos nombres y sube el número `?v=` en `index.html` y `js/pages/home.js` para que los navegadores no muestren el antiguo.
+
 ## Panel de gestión (`/admin.html`)
 Pensado para usarse sin conocimientos técnicos, también desde el móvil:
 - Añadir, editar y eliminar vehículos.
@@ -61,12 +69,15 @@ js/ui.js      cabecera, pie, tarjetas, WhatsApp, formularios…
 js/pages/     lógica de cada página
 server.js     servidor sin dependencias (API + estáticos)
 fonts/        tipografías Inter y Sora autoalojadas (SIL OFL)
+media/        vídeo e imagen de la portada
+img/          logotipo (logo-mark, logo-footer), favicons, iconos y og-image
+site.webmanifest  iconos para "Añadir a pantalla de inicio"
 ```
 
 ## Pendiente antes de publicar
 - Sustituir todos los **[DATO A CONFIRMAR]** y **[TEXTO A PERSONALIZAR…]**.
 - Revisar los textos legales con un asesor.
 - Cargar el stock real y eliminar los vehículos DEMO.
-- Sustituir las fotografías ilustrativas y el logotipo provisional.
+- Sustituir las fotografías ilustrativas.
 - Poner `DEMO_MODE: false` y definir `ADMIN_PASSWORD`.
 - Servir la web con HTTPS.

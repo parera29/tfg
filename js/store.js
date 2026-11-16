@@ -16,7 +16,7 @@
   function lsGet(k, fb) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
   function lsSet(k, v) {
     try { localStorage.setItem(k, JSON.stringify(v)); return true; }
-    catch (e) { throw new Error('No hay espacio suficiente en el navegador para guardar. Reduce el número o tamaño de las fotos.'); }
+    catch (e) { throw new Error('No se ha guardado: el navegador no tiene más espacio para fotos en el modo demostración. Borra alguna foto o usa la web con server.js, que no tiene este límite.'); }
   }
   function ssGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
   function ssSet(k, v) { try { v == null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch (e) {} }
