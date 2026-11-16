@@ -1,9 +1,11 @@
 /* ==========================================================================
    Servidor de Gabriel Automoción — sin dependencias (Node.js >= 18)
    --------------------------------------------------------------------------
+   Para usar la web en un ordenador o en un servidor propio (VPS, Render, Railway).
    - Sirve la web estática.
-   - API REST para el panel de administración (stock, fotos y solicitudes).
+   - API REST para el panel de administración (lógica en lib/api.js).
    - Persistencia en archivos JSON (data/) y fotos en uploads/.
+   En Vercel no se usa este archivo: allí la API es api/router.js.
 
    Uso:   ADMIN_PASSWORD="una-contraseña-segura" node server.js
    Variables de entorno:
@@ -18,7 +20,7 @@ const fs = require('fs');
 const fsp = fs.promises;
 const path = require('path');
 const crypto = require('crypto');
-const vm = require('vm');
+const api = require('./lib/api');
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, 'data');
@@ -26,9 +28,11 @@ const UPLOAD_DIR = path.join(ROOT, 'uploads');
 const VEH_FILE = path.join(DATA_DIR, 'vehicles.json');
 const LEADS_FILE = path.join(DATA_DIR, 'leads.json');
 const PORT = +process.env.PORT || 3000;
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'demo';
-const LEAD_WEBHOOK_URL = process.env.LEAD_WEBHOOK_URL || '';
-const TOKEN_TTL = 12 * 60 * 60 * 1000;
+const CFG = {
+  adminPassword: process.env.ADMIN_PASSWORD || 'demo',
+  authSecret: process.env.AUTH_SECRET || '',
+  leadWebhookUrl: process.env.LEAD_WEBHOOK_URL || ''
+};
 
 const MIME = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'application/javascript; charset=utf-8',
@@ -37,20 +41,14 @@ const MIME = {
   '.mp4': 'video/mp4', '.webm': 'video/webm', '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8', '.webmanifest': 'application/manifest+json'
 };
 // Rutas que nunca se sirven como estáticos
-const BLOCKED = [/^\/data(\/|$)/, /^\/\./, /^\/node_modules(\/|$)/, /^\/server\.js$/, /^\/package(-lock)?\.json$/];
+const BLOCKED = [/^\/data(\/|$)/, /^\/\./, /^\/node_modules(\/|$)/, /^\/(lib|api)(\/|$)/, /^\/server\.js$/, /^\/package(-lock)?\.json$/, /^\/vercel\.json$/];
 
-/* ---------------- persistencia ---------------- */
+/* ---------------- almacén en archivos ---------------- */
 fs.mkdirSync(DATA_DIR, { recursive: true });
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
-function loadDemo() {
-  const code = fs.readFileSync(path.join(ROOT, 'js', 'demo-data.js'), 'utf8');
-  const ctx = { window: {} };
-  vm.runInNewContext(code, ctx);
-  return JSON.parse(JSON.stringify(ctx.window.DEMO_VEHICLES || []));
-}
-function readJson(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return fallback; }
+function readJson(file) {
+  try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch (e) { return null; }
 }
 let writing = Promise.resolve();
 function writeJson(file, data) {
@@ -62,92 +60,37 @@ function writeJson(file, data) {
   }).catch((e) => console.error('Error guardando', file, e));
   return writing;
 }
-let vehicles = readJson(VEH_FILE, null);
-if (!Array.isArray(vehicles)) { vehicles = loadDemo(); writeJson(VEH_FILE, vehicles); }
-let leads = readJson(LEADS_FILE, []);
-if (!Array.isArray(leads)) leads = [];
-
-/* ---------------- validación ---------------- */
-const str = (v, max = 200) => (v == null ? '' : String(v)).trim().slice(0, max);
-const num = (v) => { if (v === '' || v == null) return null; const n = Number(v); return Number.isFinite(n) ? n : null; };
-const ESTADOS = ['disponible', 'reservado', 'vendido'];
-function cleanVehicle(input, existing) {
-  const v = Object.assign({}, existing || {});
-  const s = {
-    marca: str(input.marca, 60), modelo: str(input.modelo, 80), version: str(input.version, 120),
-    combustible: str(input.combustible, 40), cambio: str(input.cambio, 40), carroceria: str(input.carroceria, 40),
-    color: str(input.color, 40), etiqueta: str(input.etiqueta, 20), tipo: str(input.tipo, 40),
-    descripcion: str(input.descripcion, 8000)
-  };
-  Object.assign(v, s);
-  v.precio = num(input.precio);
-  v.precioAnterior = num(input.precioAnterior);
-  v.anio = num(input.anio);
-  v.km = num(input.km);
-  v.potencia = num(input.potencia);
-  v.equipamiento = Array.isArray(input.equipamiento) ? input.equipamiento.map((e) => str(e, 160)).filter(Boolean).slice(0, 150) : [];
-  v.fotos = Array.isArray(input.fotos) ? input.fotos.map((f) => str(f, 600)).filter((f) => /^(\/?uploads\/[\w.-]+|https:\/\/[^\s"'<>]+)$/.test(f)).slice(0, 40) : [];
-  v.estado = ESTADOS.includes(input.estado) ? input.estado : 'disponible';
-  v.oculto = !!input.oculto;
-  v.destacado = !!input.destacado;
-  v.demo = !!input.demo;
-  v.actualizado = new Date().toISOString();
-  if (!v.marca || !v.modelo) throw httpError(400, 'Marca y modelo son obligatorios');
-  return v;
-}
-function nextId() {
-  let max = 1000;
-  for (const v of vehicles) { const n = parseInt(String(v.id).replace(/\D/g, ''), 10); if (n > max) max = n; }
-  return 'GA-' + (max + 1);
-}
-function httpError(status, message) { const e = new Error(message); e.status = status; return e; }
-
-/* ---------------- borrado de fotos huérfanas ---------------- */
-async function cleanupUploads(candidates) {
-  const used = new Set();
-  vehicles.forEach((v) => (v.fotos || []).forEach((f) => used.add(path.basename(f))));
-  for (const f of candidates) {
-    if (!/^\/?uploads\//.test(f)) continue;
-    const name = path.basename(f);
-    if (used.has(name)) continue;
-    await fsp.unlink(path.join(UPLOAD_DIR, name)).catch(() => {});
-  }
-}
-
-/* ---------------- autenticación ---------------- */
-const tokens = new Map();
-function issueToken() {
-  const t = crypto.randomBytes(32).toString('hex');
-  tokens.set(t, Date.now() + TOKEN_TTL);
-  return t;
-}
-function isAuthed(req) {
-  const h = req.headers.authorization || '';
-  const t = h.startsWith('Bearer ') ? h.slice(7) : '';
-  const exp = tokens.get(t);
-  if (!exp) return false;
-  if (exp < Date.now()) { tokens.delete(t); return false; }
-  return true;
-}
-function safeEqual(a, b) {
-  const ha = crypto.createHash('sha256').update(String(a)).digest();
-  const hb = crypto.createHash('sha256').update(String(b)).digest();
-  return crypto.timingSafeEqual(ha, hb);
-}
-// limitador simple por IP
+let vehicles = readJson(VEH_FILE);
+let leads = readJson(LEADS_FILE);
 const buckets = new Map();
-function rateLimit(key, max, windowMs) {
-  const now = Date.now();
-  const b = buckets.get(key) || { n: 0, reset: now + windowMs };
-  if (now > b.reset) { b.n = 0; b.reset = now + windowMs; }
-  b.n++;
-  buckets.set(key, b);
-  return b.n <= max;
-}
+const fileStore = {
+  name: 'archivos',
+  async getVehicles() { return vehicles ? JSON.parse(JSON.stringify(vehicles)) : null; },
+  async setVehicles(list) { vehicles = list; await writeJson(VEH_FILE, list); },
+  async getLeads() { return leads ? JSON.parse(JSON.stringify(leads)) : []; },
+  async setLeads(list) { leads = list; await writeJson(LEADS_FILE, list); },
+  async savePhoto(buf, ext) {
+    const name = Date.now().toString(36) + '-' + crypto.randomBytes(6).toString('hex') + '.' + ext;
+    await fsp.writeFile(path.join(UPLOAD_DIR, name), buf);
+    return 'uploads/' + name;
+  },
+  ownsPhoto(url) { return /^\/?uploads\/[\w.-]+$/.test(url); },
+  async deletePhotos(urls) {
+    for (const u of urls) await fsp.unlink(path.join(UPLOAD_DIR, path.basename(u))).catch(() => {});
+  },
+  // limitador simple por IP, en memoria
+  async rateLimit(key, max, windowMs) {
+    const now = Date.now();
+    const b = buckets.get(key) || { n: 0, reset: now + windowMs };
+    if (now > b.reset) { b.n = 0; b.reset = now + windowMs; }
+    b.n++;
+    buckets.set(key, b);
+    return b.n <= max;
+  }
+};
 setInterval(() => {
   const now = Date.now();
   for (const [k, b] of buckets) if (now > b.reset) buckets.delete(k);
-  for (const [t, e] of tokens) if (e < now) tokens.delete(t);
 }, 10 * 60 * 1000).unref();
 
 /* ---------------- utilidades HTTP ---------------- */
@@ -165,12 +108,12 @@ function readBody(req, limit) {
     let size = 0; const chunks = [];
     req.on('data', (c) => {
       size += c.length;
-      if (size > limit) { reject(httpError(413, 'El contenido es demasiado grande')); req.destroy(); return; }
+      if (size > limit) { reject(api.httpError(413, 'El contenido es demasiado grande')); req.destroy(); return; }
       chunks.push(c);
     });
     req.on('end', () => {
       if (!chunks.length) return resolve({});
-      try { resolve(JSON.parse(Buffer.concat(chunks).toString('utf8'))); } catch (e) { reject(httpError(400, 'JSON no válido')); }
+      try { resolve(JSON.parse(Buffer.concat(chunks).toString('utf8'))); } catch (e) { reject(api.httpError(400, 'JSON no válido')); }
     });
     req.on('error', reject);
   });
@@ -179,133 +122,12 @@ function ip(req) { return (req.headers['x-forwarded-for'] || '').split(',')[0].t
 
 /* ---------------- API ---------------- */
 async function handleApi(req, res, url) {
-  const parts = url.pathname.replace(/^\/api\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
-  const [resource, id] = parts;
-  const method = req.method;
-  const authed = isAuthed(req);
-  const requireAuth = () => { if (!authed) throw httpError(401, 'Sesión no válida o caducada. Vuelve a iniciar sesión.'); };
-
-  if (resource === 'health') return send(res, 200, { ok: true });
-
-  if (resource === 'login' && method === 'POST') {
-    if (!rateLimit('login:' + ip(req), 10, 15 * 60 * 1000)) throw httpError(429, 'Demasiados intentos. Espera unos minutos.');
-    const body = await readBody(req, 10 * 1024);
-    if (!safeEqual(body.password || '', ADMIN_PASSWORD)) throw httpError(401, 'Contraseña incorrecta');
-    return send(res, 200, { token: issueToken() });
-  }
-
-  if (resource === 'vehicles') {
-    const all = authed && url.searchParams.get('all') === '1';
-    if (method === 'GET' && !id) return send(res, 200, all ? vehicles : vehicles.filter((v) => !v.oculto));
-    if (method === 'GET' && id) {
-      const v = vehicles.find((x) => x.id === id);
-      if (!v || (v.oculto && !all)) throw httpError(404, 'Vehículo no encontrado');
-      return send(res, 200, v);
-    }
-    requireAuth();
-    if (method === 'POST' && !id) {
-      const v = cleanVehicle(await readBody(req, 2 * 1024 * 1024));
-      v.id = nextId(); v.creado = v.actualizado;
-      vehicles.unshift(v);
-      await writeJson(VEH_FILE, vehicles);
-      return send(res, 201, v);
-    }
-    const i = vehicles.findIndex((x) => x.id === id);
-    if (i === -1) throw httpError(404, 'Vehículo no encontrado');
-    if (method === 'PUT') {
-      const before = vehicles[i].fotos || [];
-      const v = cleanVehicle(await readBody(req, 2 * 1024 * 1024), vehicles[i]);
-      v.id = id;
-      vehicles[i] = v;
-      await writeJson(VEH_FILE, vehicles);
-      await cleanupUploads(before.filter((f) => !v.fotos.includes(f)));
-      return send(res, 200, v);
-    }
-    if (method === 'DELETE') {
-      const [removed] = vehicles.splice(i, 1);
-      await writeJson(VEH_FILE, vehicles);
-      await cleanupUploads(removed.fotos || []);
-      return send(res, 200, { ok: true });
-    }
-  }
-
-  if (resource === 'upload' && method === 'POST') {
-    requireAuth();
-    const body = await readBody(req, 15 * 1024 * 1024);
-    const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(body.dataUrl || '');
-    if (!m) throw httpError(400, 'Formato de imagen no válido (JPG, PNG o WEBP)');
-    const buf = Buffer.from(m[2], 'base64');
-    if (buf.length > 10 * 1024 * 1024) throw httpError(413, 'La imagen supera 10 MB');
-    const name = Date.now().toString(36) + '-' + crypto.randomBytes(6).toString('hex') + '.' + (m[1] === 'jpeg' ? 'jpg' : m[1]);
-    await fsp.writeFile(path.join(UPLOAD_DIR, name), buf);
-    return send(res, 201, { url: 'uploads/' + name });
-  }
-
-  if (resource === 'leads') {
-    if (method === 'POST' && !id) {
-      if (!rateLimit('lead:' + ip(req), 20, 60 * 60 * 1000)) throw httpError(429, 'Has enviado demasiadas solicitudes. Inténtalo más tarde.');
-      const b = await readBody(req, 50 * 1024);
-      if (!b.privacidad) throw httpError(400, 'Debes aceptar la política de privacidad');
-      const lead = {
-        id: 'L' + Date.now().toString(36) + crypto.randomBytes(2).toString('hex'),
-        fecha: new Date().toISOString(), estado: 'nuevo',
-        tipo: str(b.tipo, 40), motivo: str(b.motivo, 60), asunto: str(b.asunto, 80),
-        nombre: str(b.nombre, 120), telefono: str(b.telefono, 40), email: str(b.email, 160),
-        mensaje: str(b.mensaje, 4000), vehiculoId: str(b.vehiculoId, 40), vehiculoTitulo: str(b.vehiculoTitulo, 200),
-        importe: str(b.importe, 20), pagina: str(b.pagina, 80), privacidad: true
-      };
-      if (!lead.nombre || (!lead.telefono && !lead.email)) throw httpError(400, 'Faltan datos de contacto');
-      leads.unshift(lead);
-      await writeJson(LEADS_FILE, leads);
-      if (LEAD_WEBHOOK_URL) fetch(LEAD_WEBHOOK_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) }).catch((e) => console.error('Webhook:', e.message));
-      return send(res, 201, { ok: true, id: lead.id });
-    }
-    requireAuth();
-    if (method === 'GET' && !id) return send(res, 200, leads);
-    const i = leads.findIndex((l) => l.id === id);
-    if (i === -1) throw httpError(404, 'Solicitud no encontrada');
-    if (method === 'PUT') {
-      const b = await readBody(req, 20 * 1024);
-      if (b.estado) leads[i].estado = str(b.estado, 20);
-      if (b.nota != null) leads[i].nota = str(b.nota, 2000);
-      await writeJson(LEADS_FILE, leads);
-      return send(res, 200, leads[i]);
-    }
-    if (method === 'DELETE') {
-      leads.splice(i, 1);
-      await writeJson(LEADS_FILE, leads);
-      return send(res, 200, { ok: true });
-    }
-  }
-
-  if (resource === 'reset' && method === 'POST') {
-    requireAuth();
-    const old = vehicles.flatMap((v) => v.fotos || []);
-    vehicles = loadDemo();
-    await writeJson(VEH_FILE, vehicles);
-    await cleanupUploads(old);
-    return send(res, 200, { ok: true });
-  }
-
-  if (resource === 'import' && method === 'POST') {
-    requireAuth();
-    const b = await readBody(req, 20 * 1024 * 1024);
-    if (!Array.isArray(b.vehiculos)) throw httpError(400, 'Formato no válido');
-    const seen = new Set();
-    vehicles = b.vehiculos.map((x) => {
-      const v = cleanVehicle(x);
-      v.id = str(x.id, 40) || null;
-      if (!v.id || seen.has(v.id)) v.id = null;
-      if (v.id) seen.add(v.id);
-      v.creado = str(x.creado, 40) || v.actualizado;
-      return v;
-    });
-    vehicles.forEach((v) => { if (!v.id) { v.id = nextId(); seen.add(v.id); } });
-    await writeJson(VEH_FILE, vehicles);
-    return send(res, 200, { ok: true, total: vehicles.length });
-  }
-
-  throw httpError(404, 'Ruta no encontrada');
+  const body = req.method === 'GET' || req.method === 'HEAD' ? {} : await readBody(req, 20 * 1024 * 1024);
+  const r = await api.run({
+    method: req.method, path: url.pathname.replace(/^\/api/, ''), query: url.searchParams,
+    headers: req.headers, body, ip: ip(req)
+  }, fileStore, CFG);
+  send(res, r.status, r.body);
 }
 
 /* ---------------- estáticos ---------------- */

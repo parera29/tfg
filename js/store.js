@@ -2,8 +2,8 @@
    CAPA DE DATOS
    --------------------------------------------------------------------------
    Funciona en dos modos, detectados automáticamente:
-   - "api":   la web se sirve con server.js → stock, fotos y solicitudes se
-              guardan en el servidor (data/*.json y uploads/).
+   - "api":   la web tiene servidor (server.js, o api/router.js en Vercel) →
+              stock, fotos y solicitudes se guardan para todos los visitantes.
    - "local": la web se abre como estática (hosting simple o doble clic) →
               los cambios se guardan en el navegador (localStorage).
    ========================================================================== */
@@ -12,11 +12,12 @@
   var KEY_LEADS = 'ga_leads_v1';
   var KEY_AUTH = 'ga_admin_token';
   var KEY_MODE = 'ga_mode';
+  var KEY_WHY = 'ga_mode_why';
 
   function lsGet(k, fb) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : fb; } catch (e) { return fb; } }
   function lsSet(k, v) {
     try { localStorage.setItem(k, JSON.stringify(v)); return true; }
-    catch (e) { throw new Error('No se ha guardado: el navegador no tiene más espacio para fotos en el modo demostración. Borra alguna foto o usa la web con server.js, que no tiene este límite.'); }
+    catch (e) { throw new Error('No se ha guardado: el navegador no tiene más espacio para fotos en el modo demostración. Borra alguna foto o publica la web con almacenamiento (Vercel o server.js), que no tiene este límite.'); }
   }
   function ssGet(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
   function ssSet(k, v) { try { v == null ? sessionStorage.removeItem(k) : sessionStorage.setItem(k, v); } catch (e) {} }
@@ -57,6 +58,7 @@
           clearTimeout(to);
           var j = r.ok ? await r.json() : null;
           mode = j && j.ok ? 'api' : 'local';
+          ssSet(KEY_WHY, j && !j.ok && j.error ? String(j.error) : null);
         } catch (e) { mode = 'local'; }
       }
       ssSet(KEY_MODE, mode);
@@ -80,6 +82,8 @@
   var Store = {
     init: init,
     get mode() { return mode; },
+    /** Si hay servidor pero le falta configuración (p. ej. almacenamiento en Vercel), el motivo. */
+    get modeReason() { return ssGet(KEY_WHY); },
 
     /* ---------------- Vehículos ---------------- */
     async getVehicles(opts) {

@@ -2,7 +2,7 @@
   "name": "gabriel-automocion-web",
   "version": "1.0.0",
   "private": true,
-  "description": "Web demo de Gabriel Automoción: catálogo de vehículos, financiación, contacto y panel de gestión de stock.",
+  "description": "Web de Gabriel Automoción: catálogo de vehículos, financiación, contacto y panel de gestión de stock. Funciona con server.js o en Vercel.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -11,5 +11,8 @@
   "engines": {
     "node": ">=18"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@vercel/blob": "2.8.2"
+  }
 }

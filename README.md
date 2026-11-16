@@ -6,8 +6,20 @@ Web **demo funcional** para el concesionario Gabriel Automoción: catálogo de v
 
 ## Puesta en marcha
 
-### Opción A — Con servidor (recomendada, todo funciona de verdad)
-Requiere Node.js 18 o superior. **No hay dependencias que instalar.**
+### Opción A — En Vercel (recomendada para tenerla en internet)
+Vercel publica la web automáticamente cada vez que se sube un cambio a GitHub. Como Vercel no tiene disco permanente, el stock y las solicitudes se guardan en **Upstash Redis** y las fotos en **Vercel Blob** (los dos tienen plan gratuito suficiente para esta web). La API está en `api/router.js` y comparte toda la lógica con `server.js` (`lib/api.js`).
+
+1. En [vercel.com](https://vercel.com), entra con tu cuenta de GitHub → **Add New → Project** → importa este repositorio → **Deploy** (no hay que cambiar ningún ajuste).
+2. En el proyecto, pestaña **Storage**:
+   - **Create Database → Upstash for Redis** (plan gratuito) → **Connect** al proyecto.
+   - **Create → Blob** → elige acceso **Public** → **Connect** al proyecto.
+3. En **Settings → Environment Variables** añade `ADMIN_PASSWORD` con la contraseña que quieras para el panel. Opcional: `LEAD_WEBHOOK_URL`.
+4. En **Deployments**, en el último despliegue, pulsa **⋯ → Redeploy** para que coja las variables nuevas.
+
+Comprobación: `https://TU-PROYECTO.vercel.app/api/health` debe responder `{"ok":true,"storage":"vercel"}`. Si falta algo, la web sigue funcionando en modo demostración y el panel dice qué falta conectar.
+
+### Opción B — Con servidor propio (ordenador, VPS, Render, Railway)
+Requiere Node.js 18 o superior. **No hay dependencias que instalar** para este modo.
 
 ```bash
 ADMIN_PASSWORD="una-contraseña-segura" npm start
@@ -20,7 +32,7 @@ ADMIN_PASSWORD="una-contraseña-segura" npm start
 - Las fotos subidas se optimizan en el navegador y se guardan en `uploads/`.
 - Opcional: `LEAD_WEBHOOK_URL=https://…` envía cada solicitud nueva a un webhook (Make, Zapier, n8n…) para recibirla por email.
 
-### Opción B — Estática (para enseñar la demo sin servidor)
+### Opción C — Estática (para enseñar la demo sin servidor)
 Basta con abrir `index.html` o publicar la carpeta en cualquier hosting estático (GitHub Pages, Netlify…).
 La web detecta que no hay servidor y el panel guarda los cambios **solo en ese navegador** (localStorage). Contraseña de prueba: `demo`.
 
@@ -67,7 +79,10 @@ js/demo-data.js  vehículos DEMO
 js/store.js   capa de datos (servidor o navegador)
 js/ui.js      cabecera, pie, tarjetas, WhatsApp, formularios…
 js/pages/     lógica de cada página
-server.js     servidor sin dependencias (API + estáticos)
+server.js     servidor sin dependencias (API + estáticos) para ordenador o VPS
+api/router.js API para Vercel (Upstash Redis + Vercel Blob)
+lib/api.js    lógica común de la API (validación, acceso, stock, solicitudes)
+vercel.json   reescritura /api/* → api/router.js y cabeceras
 fonts/        tipografías Inter y Sora autoalojadas (SIL OFL)
 media/        vídeo e imagen de la portada
 img/          logotipo (logo-mark, logo-footer), favicons, iconos y og-image
@@ -80,4 +95,4 @@ site.webmanifest  iconos para "Añadir a pantalla de inicio"
 - Cargar el stock real y eliminar los vehículos DEMO.
 - Sustituir las fotografías ilustrativas.
 - Poner `DEMO_MODE: false` y definir `ADMIN_PASSWORD`.
-- Servir la web con HTTPS.
+- Servir la web con HTTPS (Vercel ya lo hace).

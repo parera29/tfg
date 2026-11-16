@@ -30,7 +30,8 @@
     $('login').hidden = true; $('app').hidden = false;
     $('modeBanner').innerHTML = mode === 'api'
       ? icon('check') + '<span><strong>Conectado al servidor.</strong> Los cambios se guardan para todos los visitantes de la web.</span>'
-      : icon('info') + '<span><strong>Modo demostración sin servidor.</strong> Los cambios se guardan solo en este navegador. Para publicar cambios reales, ejecuta la web con <code>server.js</code> (ver README).</span>';
+      : icon('info') + '<span><strong>Modo demostración sin servidor.</strong> Los cambios se guardan solo en este navegador. ' +
+        (Store.modeReason ? esc(Store.modeReason) + ' (ver README).' : 'Para publicar cambios reales, publica la web en Vercel con su almacenamiento o ejecútala con <code>server.js</code> (ver README).') + '</span>';
     $('modeBanner').className = 'mode-banner mode-banner--' + mode;
     if (mode === 'api') {
       // comprueba que la sesión sigue siendo válida (p. ej. tras reiniciar el servidor)
